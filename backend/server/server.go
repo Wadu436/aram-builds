@@ -15,11 +15,10 @@ type ServerConfig struct {
 func Server(config ServerConfig) {
 	r := gin.Default()
 
-	r.Use(config.Auth.BasicAuthMiddleware)
+	auth := r.Group("/", config.Auth.BasicAuthMiddleware)
 
-	r.GET("/", func(ctx *gin.Context) {
-		ctx.String(http.StatusOK, "Secret things :D")
-		return
+	auth.POST("auth/check/", func(c *gin.Context) {
+		c.Status(http.StatusOK)
 	})
 
 	r.Run(config.BindAddr)
