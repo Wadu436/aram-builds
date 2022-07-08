@@ -37,7 +37,7 @@ type Error struct {
 // Custom JSON Marshalling
 func (t JSONTime) MarshalJSON() ([]byte, error) {
 	_ = time.UnixDate
-	stamp := fmt.Sprintf(`"%s"`, time.Time(t).UTC().Format("2006-01-02T15:04:05.999Z"))
+	stamp := fmt.Sprintf(`"%s"`, time.Time(t).UTC().Format("2006-01-02T15:04:05.000Z"))
 	return []byte(stamp), nil
 }
 func (items Items) MarshalJSON() ([]byte, error) {
