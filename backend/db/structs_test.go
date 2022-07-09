@@ -33,16 +33,17 @@ const expectedJson string = `{
     "champion": "Aatrox",
     "runes": {
         "primaryKey": "Precision",
-        "primarySelection": [1, 0, 2, 2],
+        "primarySelections": [1, 0, 2, 2],
         "secondaryKey": "Domination",
-        "secondarySelection": [2, 1, 3],
+        "secondarySelections": [2, 1, 3],
         "stats": [1, 0, 2]
     },
     "items": {
         "start": ["1001", "2314"],
         "fullbuild": ["4821", "3245", "2345", "1278", "9642", "2974"]
     },
-    "gameVersion": "12.7",
+    "gameVersionMajor": 12,
+	"gameVersionMinor": 7,
     "mtime": "2022-07-08T01:37:04.218Z"
 }`
 
@@ -58,7 +59,7 @@ func validBuildStruct() db.Build {
 		Start:     []string{"1001", "2314"},
 		FullBuild: []string{"4821", "3245", "2345", "1278", "9642", "2974"},
 	}
-	return db.Build{Champion: "Aatrox", Runes: runes, Items: items, GameVersion: "12.7", Mtime: db.JSONTime(time.Date(2022, 7, 8, 1, 37, 4, 218000000, time.UTC))}
+	return db.Build{Champion: "Aatrox", Runes: runes, Items: items, GameVersionMajor: 12, GameVersionMinor: 7, Mtime: db.JSONTime(time.Date(2022, 7, 8, 1, 37, 4, 218000000, time.UTC))}
 }
 
 func TestBuildsJSON(t *testing.T) {
