@@ -17,13 +17,15 @@ func main() {
 	dbName := "test"
 
 	dsn := fmt.Sprintf("postgresql://%v:%v@%v/%v", dbUser, dbPass, dbAddr, dbName)
-	fmt.Println(dsn)
 	databaseConfig := db.DBConfig{
 		ConnString: dsn,
 	}
 
 	db.InitializeDB(databaseConfig)
-	db.Migrate()
+	err := db.Migrate()
+	if err != nil {
+		log.Fatal("Error during migrations. Shutting Down.")
+	}
 
 	auth := auth.Auth{
 		LoadUser:   db.LoadUser,

@@ -5,7 +5,6 @@ go 1.18
 require (
 	github.com/gin-gonic/gin v1.8.1
 	github.com/jackc/pgx/v4 v4.16.1
-	github.com/jmoiron/sqlx v1.3.5
 	github.com/wadu436/gin-auth v0.0.0-20220708190659-6984e0f52152
 )
 
@@ -23,6 +22,7 @@ require (
 	github.com/jackc/pgproto3/v2 v2.3.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect
 	github.com/jackc/pgtype v1.11.0 // indirect
+	github.com/jackc/puddle v1.2.1 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect

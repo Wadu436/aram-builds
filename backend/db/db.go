@@ -1,43 +1,29 @@
 package db
 
 import (
-	"fmt"
+	"context"
 	"log"
 
-	_ "github.com/jackc/pgx/v4/stdlib"
-	"github.com/jmoiron/sqlx"
-	auth "github.com/wadu436/gin-auth"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type DBConfig struct {
 	ConnString string
 }
 
-var database *sqlx.DB
+var dbpool *pgxpool.Pool
 
 func InitializeDB(config DBConfig) {
-	database = sqlx.MustOpen("pgx", config.ConnString)
-	database.Ping()
-	fmt.Println("Database Connected!")
-}
+	var err error
 
-func LoadUser(username string) (auth.User, bool) {
-	var user auth.User
-	err := database.Get(&user, "SELECT username, password, salt FROM users WHERE username = $1;", username)
-	if err != nil {
-		return auth.User{}, false
-	}
-	return user, true
-}
-
-func StoreUser(user auth.User) {
-	log.Println(user)
-	_, err := database.Exec(`DELETE FROM users WHERE username = $1;`, user.Username)
+	log.Printf("DB: Connecting to \"%v\"...\n", config.ConnString)
+	dbpool, err = pgxpool.Connect(context.Background(), config.ConnString)
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = database.Exec(`INSERT INTO users (username, password, salt) VALUES ($1, $2, $3);`, user.Username, user.Password, user.Salt)
+	err = dbpool.Ping(context.Background())
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("DB: ERROR: Couldn't connect to database")
 	}
+	log.Println("DB: Connected")
 }
