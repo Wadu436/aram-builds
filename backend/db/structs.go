@@ -20,6 +20,7 @@ type Build struct {
 	Items            Items    `json:"items"`
 	GameVersionMajor int      `json:"gameVersionMajor"`
 	GameVersionMinor int      `json:"gameVersionMinor"`
+	Comment          string   `json:"comment"`
 	Mtime            JSONTime `json:"mtime"`
 }
 
@@ -87,6 +88,7 @@ func (build *Build) UnmarshalJSON(data []byte) (err error) {
 		Items            Items    `json:"items"`
 		GameVersionMajor int      `json:"gameVersionMajor"`
 		GameVersionMinor int      `json:"gameVersionMinor"`
+		Comment          string   `json:"comment"`
 		Mtime            JSONTime `json:"mtime"`
 	}{}
 
@@ -102,6 +104,7 @@ func (build *Build) UnmarshalJSON(data []byte) (err error) {
 		build.Items = all.Items
 		build.GameVersionMajor = all.GameVersionMajor
 		build.GameVersionMinor = all.GameVersionMinor
+		build.Comment = all.Comment
 		build.Mtime = all.Mtime
 	}
 	return

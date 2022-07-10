@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-var MIGRATIONS []string = []string{"000_create_users.sql", "001_create_builds.sql"}
+var MIGRATIONS []string = []string{"000_create_users.sql", "001_create_builds.sql", "002_add_comments_field.sql"}
 
 //go:embed migrations/*
 var f embed.FS
