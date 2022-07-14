@@ -12,14 +12,20 @@ import (
 )
 
 type ServerConfig struct {
-	BindAddr string
-	Auth     auth.Auth
+	BindAddr       string
+	TrustedProxies []string
+	Auth           auth.Auth
 }
 
 func Server(config ServerConfig) {
-	// gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.ReleaseMode)
 
-	r := gin.Default()
+	r := gin.New()
+
+	r.Use(gin.Logger())
+	r.Use(gin.Recovery())
+
+	r.SetTrustedProxies(config.TrustedProxies)
 
 	// Auth routes
 	auth := r.Group("/", config.Auth.BasicAuthMiddleware)
