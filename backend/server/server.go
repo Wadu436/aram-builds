@@ -17,6 +17,8 @@ type ServerConfig struct {
 }
 
 func Server(config ServerConfig) {
+	// gin.SetMode(gin.ReleaseMode)
+
 	r := gin.Default()
 
 	// Auth routes
@@ -113,5 +115,4 @@ func ErrorBadRequest(c *gin.Context) {
 
 func ErrorNotFound(c *gin.Context) {
 	c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"code": 3, "message": "Not Found"})
-
 }
