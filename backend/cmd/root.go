@@ -50,8 +50,8 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&dbConfig.User, "user", "U", os.Getenv("POSTGRES_USER"), "Database user. Can also be set by the environment variable POSTGRES_USER.")
-	rootCmd.PersistentFlags().StringVarP(&dbConfig.Password, "password", "P", os.Getenv("POSTGRES_PASSWORD"), "Database password. Can also be set by the environment variable POSTGRES_PASSWORD.")
-	rootCmd.PersistentFlags().StringVarP(&dbConfig.Address, "address", "a", os.Getenv("POSTGRES_ADDRESS"), "Database address and port (e.g. localhost:5432). Can also be set by the environment variable POSTGRES_ADDRESS.")
-	rootCmd.PersistentFlags().StringVarP(&dbConfig.DatabaseName, "database", "d", os.Getenv("POSTGRES_DATABASE"), "Database name. Can also be set by the environment variable POSTGRES_DATABASE.")
+	rootCmd.PersistentFlags().StringVarP(&dbConfig.User, "user", "U", os.Getenv("POSTGRES_USER"), "database user, can also be set by the environment variable POSTGRES_USER")
+	rootCmd.PersistentFlags().StringVarP(&dbConfig.Password, "password", "P", os.Getenv("POSTGRES_PASSWORD"), "database password, can also be set by the environment variable POSTGRES_PASSWORD")
+	rootCmd.PersistentFlags().StringVarP(&dbConfig.Address, "address", "a", os.Getenv("POSTGRES_ADDRESS"), "database address and port (e.g. localhost:5432), can also be set by the environment variable POSTGRES_ADDRESS")
+	rootCmd.PersistentFlags().StringVarP(&dbConfig.DatabaseName, "database", "d", os.Getenv("POSTGRES_DATABASE"), "database name, can also be set by the environment variable POSTGRES_DATABASE")
 }

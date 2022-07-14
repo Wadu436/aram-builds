@@ -23,7 +23,8 @@ var serverConfig server.ServerConfig = server.ServerConfig{
 
 func init() {
 	rootCmd.AddCommand(serverCmd)
-	serverCmd.Flags().StringVarP(&serverConfig.BindAddr, "bind-address", "b", os.Getenv("BIND_ADDRESS"), "IP Address the server binds to. Can also be set by the environment variable BIND_ADDRESS.")
+	serverCmd.Flags().StringVarP(&serverConfig.BindAddr, "bind-address", "b", os.Getenv("BIND_ADDRESS"), "ip address the server binds to, can also be set by the environment variable BIND_ADDRESS")
+	serverCmd.Flags().StringSliceVarP(&serverConfig.TrustedProxies, "trusted-proxies", "t", strings.Split(os.Getenv("TRUSTED_PROXIES"), ","), "which proxies the server should trust, splits on commas, can also be set by the environment variable BIND_ADDRESS, which also splits on commas (e.g. \"127.0.0.1:80,192.168.2.1\")")
 }
 
 var serverCmd = &cobra.Command{
