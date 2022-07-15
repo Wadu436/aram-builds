@@ -4,6 +4,10 @@ defineProps<{
 }>();
 </script>
 
+<script lang="ts">
+export {};
+</script>
+
 <template>
   <div class="greetings">
     <h1 class="green">{{ msg }}</h1>
