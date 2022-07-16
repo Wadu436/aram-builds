@@ -112,7 +112,7 @@ export const useDataDragonStore = defineStore({
               this.champions.set(value.id, {
                 id: value.id,
                 name: value.name,
-                title: value.title,
+                title: value.title.charAt(0).toUpperCase() + value.title.slice(1),
                 blurb: value.blurb,
                 image: `https://ddragon.leagueoflegends.com/cdn/${urlVersion}/img/champion/${value.image.full}`,
                 sprite: {

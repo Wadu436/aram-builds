@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from "vue-router";
 import { ref } from "vue";
+import LoadingOverlay from "./components/LoadingOverlay.vue";
 
 const open = ref(false);
 
 const navItems = [
-  { to: "/", title: "Home" },
-  { to: "/about", title: "About" },
+  { to: "/", title: "Champions" },
+  // { to: "/about", title: "About" },
 ];
 
 function toggle() {
@@ -16,11 +17,11 @@ function toggle() {
 
 <template>
   <div class="flex flex-col max-h-screen">
-    <nav
-      class="flex items-center justify-between flex-wrap bg-stone-800 px-6 py-3"
+    <!-- <nav
+      class="flex flex-initial items-center justify-between flex-wrap bg-stone-800 px-6 py-3"
     >
       <div class="mr-6">
-        <span class="font-semibold text-2xl tracking-tight">ARAM Builds</span>
+        <span class="font-bold font-title text-2xl tracking-tight">ARAM Builds</span>
       </div>
       <div class="block sm:hidden">
         <button
@@ -44,13 +45,19 @@ function toggle() {
         <div
           class="mr-3 p-3 text-xl text-stone-300 hover:text-stone-50"
           v-for="item in navItems"
+          :key="item.title"
         >
           <RouterLink :to="item.to">{{ item.title }}</RouterLink>
         </div>
       </div>
-    </nav>
-    <RouterView />
+    </nav> -->
+    <div class="relative overflow-hidden flex-auto flex">
+      <!-- <LoadingOverlay /> -->
+      <RouterView />
+    </div>
+    
   </div>
+  
 </template>
 
 <style></style>

@@ -12,6 +12,10 @@ const app = createApp(App);
 app.use(createPinia());
 app.use(router);
 
+// (async () => {
+
+// })()
+
 const dataDragonStore = useDataDragonStore();
 dataDragonStore.initialize();
 

@@ -1,22 +1,32 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useDataDragonStore } from "../stores/DataDragonStore";
 
 import { RouterLink } from "vue-router";
 import ChampionPortrait from "../components/ChampionPortrait.vue";
 
+const SPECIAL_CHAR_REGEX = /[^a-zA-Z]/g;
+function canonicalizeString(str: string) {
+  return str.toLowerCase().replace(SPECIAL_CHAR_REGEX, "");
+}
+
 const searchString = ref("");
 const dataDragonStore = useDataDragonStore();
-// const champions = DataDragonCache.getChampions();
+const filteredChampions = computed(() => {
+  let champions = [...dataDragonStore.champions.values()];
+
+  return champions.filter((c) =>
+    canonicalizeString(c.name).includes(canonicalizeString(searchString.value))
+  );
+});
 </script>
 
 <template>
-  <div
-    class="flex-auto flex basis-full w-full items-center flex-col overflow-hidden"
-  >
-    <div class="flex bg-stone-800 rounded-2xl w-fit items-center">
+  <div class="flex flex-auto w-full items-center flex-col overflow-hidden">
+    <!-- Search -->
+    <div class="mt-6 flex bg-stone-800 rounded-md items-center">
       <input
-        class="bg-transparent text-xl p-3 placeholder:text-stone-400 hover:placeholder:text-stone-300 focus:outline-none"
+        class="w-80 bg-transparent text-xl p-3 placeholder:text-stone-400 hover:placeholder:text-stone-300 focus:outline-none"
         type="text"
         name=""
         id=""
@@ -35,18 +45,53 @@ const dataDragonStore = useDataDragonStore();
         </svg>
       </div>
     </div>
+    <!-- Champion Grid -->
     <div
-      class="flex flex-col w-2/3 overflow-y-scroll scroll-smooth justify-center content-center h-3/4"
+      class="mt-6 grid grid-cols-fill-12 gap-2 flex-shrink overflow-y-scroll w-11/12"
     >
-      <div class="flex flex-wrap">
-        <RouterLink
-          to="/"
-          v-for="champion in [...dataDragonStore.champions.values()]"
-          :title="champion.name"
-        >
-          <ChampionPortrait :champion="champion"></ChampionPortrait>
-        </RouterLink>
-      </div>
+      <RouterLink
+        to="/"
+        v-for="champion in filteredChampions"
+        :key="champion.name"
+      >
+        <ChampionPortrait :champion="champion" />
+      </RouterLink>
     </div>
   </div>
 </template>
+
+<style scoped>
+.champion-col {
+  width: 20rem;
+}
+
+@media (min-width: 640px) {
+  .champion-col {
+    width: 30rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .champion-col {
+    width: 40rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .champion-col {
+    width: 50rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .champion-col {
+    width: 60rem;
+  }
+}
+
+@media (min-width: 1536px) {
+  .champion-col {
+    width: 70rem;
+  }
+}
+</style>
