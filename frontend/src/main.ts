@@ -6,17 +6,20 @@ import App from "./App.vue";
 import router from "./router";
 
 import { useDataDragonStore } from "./stores/DataDragonStore";
+import { useStateStore } from "./stores/state";
 
 const app = createApp(App);
 
 app.use(createPinia());
 app.use(router);
 
-// (async () => {
-
-// })()
-
 const dataDragonStore = useDataDragonStore();
-dataDragonStore.initialize();
+const stateStore = useStateStore();
+
+(async () => {
+    stateStore.loading = true
+    await dataDragonStore.initialize();
+    stateStore.loading = false
+})()
 
 app.mount("#app");

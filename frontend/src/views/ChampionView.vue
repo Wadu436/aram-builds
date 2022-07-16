@@ -50,7 +50,7 @@ const filteredChampions = computed(() => {
       class="mt-6 grid grid-cols-fill-12 gap-2 flex-shrink overflow-y-scroll w-11/12"
     >
       <RouterLink
-        to="/"
+        :to="`/build/${champion.id}`"
         v-for="champion in filteredChampions"
         :key="champion.name"
       >
@@ -59,39 +59,3 @@ const filteredChampions = computed(() => {
     </div>
   </div>
 </template>
-
-<style scoped>
-.champion-col {
-  width: 20rem;
-}
-
-@media (min-width: 640px) {
-  .champion-col {
-    width: 30rem;
-  }
-}
-
-@media (min-width: 768px) {
-  .champion-col {
-    width: 40rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .champion-col {
-    width: 50rem;
-  }
-}
-
-@media (min-width: 1280px) {
-  .champion-col {
-    width: 60rem;
-  }
-}
-
-@media (min-width: 1536px) {
-  .champion-col {
-    width: 70rem;
-  }
-}
-</style>

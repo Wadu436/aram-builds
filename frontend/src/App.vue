@@ -2,8 +2,11 @@
 import { RouterLink, RouterView } from "vue-router";
 import { ref } from "vue";
 import LoadingOverlay from "./components/LoadingOverlay.vue";
+import { useStateStore } from "./stores/state";
 
 const open = ref(false);
+
+const stateStore = useStateStore();
 
 const navItems = [
   { to: "/", title: "Champions" },
@@ -16,7 +19,7 @@ function toggle() {
 </script>
 
 <template>
-  <div class="flex flex-col max-h-screen">
+  <div class="flex flex-col max-h-screen h-screen">
     <!-- <nav
       class="flex flex-initial items-center justify-between flex-wrap bg-stone-800 px-6 py-3"
     >
@@ -52,7 +55,7 @@ function toggle() {
       </div>
     </nav> -->
     <div class="relative overflow-hidden flex-auto flex">
-      <!-- <LoadingOverlay /> -->
+      <Transition><LoadingOverlay  class v-if="stateStore.loading" /></Transition>
       <RouterView />
     </div>
     
@@ -60,4 +63,14 @@ function toggle() {
   
 </template>
 
-<style></style>
+<style>
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+</style>
