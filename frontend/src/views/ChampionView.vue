@@ -3,7 +3,7 @@ import { computed, ref } from "vue";
 import { useDataDragonStore } from "../stores/DataDragonStore";
 
 import { RouterLink } from "vue-router";
-import ChampionPortrait from "../components/ChampionPortrait.vue";
+import ChampionPortrait from "../components/portraits/ChampionPortrait.vue";
 
 const SPECIAL_CHAR_REGEX = /[^a-zA-Z]/g;
 function canonicalizeString(str: string) {
@@ -49,7 +49,7 @@ const filteredChampions = computed(() => {
     </div>
     <!-- Champion Grid -->
     <div
-      class="mt-6 grid grid-cols-fill-12 gap-2 flex-shrink overflow-y-scroll w-11/12"
+      class="my-6 grid grid-cols-fill-12 gap-2 flex-shrink overflow-y-scroll thin-scrollbar w-11/12"
     >
       <RouterLink
         :to="`/build/${champion.id}`"
@@ -59,5 +59,9 @@ const filteredChampions = computed(() => {
         <ChampionPortrait :champion="champion" />
       </RouterLink>
     </div>
+    <!-- Footer -->
+    <!-- <div class="flex justify-end p-1 pr-4 w-full text-stone-600">
+      <RouterLink class="ml-1" to="/admin">Admin</RouterLink>
+    </div> -->
   </div>
 </template>

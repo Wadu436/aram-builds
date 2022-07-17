@@ -2,7 +2,7 @@
   <svg
     xmlns="http://www.w3.org/2000/svg"
     style="display: block; shape-rendering: auto"
-    width="4rem"
+    width="4em"
     viewBox="0 0 100 100"
     preserveAspectRatio="xMidYMid"
   >

@@ -27,14 +27,17 @@ func Server(config ServerConfig) {
 
 	r.SetTrustedProxies(config.TrustedProxies)
 
+	// API group
+	api := r.Group("/api")
+
 	// Auth routes
-	auth := r.Group("/", config.Auth.BasicAuthMiddleware)
+	auth := api.Group("/", config.Auth.BasicAuthMiddleware)
 	auth.POST("auth/check/", func(c *gin.Context) {
 		c.Status(http.StatusOK)
 	})
 
 	// Build routes
-	build := r.Group("/build")
+	build := api.Group("/build")
 	buildAuth := build.Group("/", config.Auth.BasicAuthMiddleware)
 
 	build.GET("/", func(c *gin.Context) {

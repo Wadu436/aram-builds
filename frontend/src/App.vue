@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from "vue-router";
 import { ref } from "vue";
-import LoadingOverlay from "./components/LoadingOverlay.vue";
+import LoadingOverlay from "./components/overlays/LoadingOverlay.vue";
 import { useStateStore } from "./stores/state";
 
 const open = ref(false);
@@ -55,22 +55,10 @@ function toggle() {
       </div>
     </nav> -->
     <div class="relative overflow-hidden flex-auto flex">
-      <Transition><LoadingOverlay  class v-if="stateStore.loading" /></Transition>
+      <LoadingOverlay />
       <RouterView />
     </div>
-    
   </div>
-  
 </template>
 
-<style>
-.v-enter-active,
-.v-leave-active {
-  transition: opacity 0.5s ease;
-}
-
-.v-enter-from,
-.v-leave-to {
-  opacity: 0;
-}
-</style>
+<style></style>
