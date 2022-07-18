@@ -1,5 +1,7 @@
 <template>
-  <div class="w-11/12 flex flex-col items-center select-none">
+  <div
+    class="w-11/12 flex flex-col items-center select-none flex-1 max-w-fit mx-4"
+  >
     <div class="text-2xl">Runes</div>
     <div class="flex bg-stone-800 w-fit p-4 rounded-md">
       <!-- First Column -->

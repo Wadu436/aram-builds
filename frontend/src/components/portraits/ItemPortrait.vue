@@ -1,14 +1,24 @@
 <template>
   <div class="bg-stone-700 w-10 h-10 rounded-md" v-if="item">
-    <div class="rounded-md" :style="customStyle"></div>
+    <Popper :hover="true" offsetDistance="4" :disabled="disabled || false">
+      <div class="rounded-md tooltip" :style="customStyle"></div>
+      <template #content>
+        <div
+          class="text-base bg-stone-800 p-2 border-2 border-black rounded-md"
+        >
+          {{ item.name }} - {{ item.cost }} Gold - {{ item.id }}
+        </div>
+      </template>
+    </Popper>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { Item } from "@/stores/DataDragonStore";
 import { computed } from "vue";
+import Popper from "vue3-popper";
 
-const props = defineProps<{ item: Item | undefined }>();
+const props = defineProps<{ item: Item | undefined; disabled?: boolean }>();
 
 const customStyle = computed(() => {
   if (props.item) {
@@ -29,4 +39,16 @@ const customStyle = computed(() => {
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.tooltip {
+  position: relative;
+}
+
+.tooltip .tooltip-text {
+  display: none;
+}
+
+.tooltip:hover .tooltip-text {
+  display: block;
+}
+</style>

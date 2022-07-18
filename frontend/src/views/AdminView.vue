@@ -42,9 +42,19 @@
             {{ selectedChampion.name }}
           </div>
         </div>
-        <div class="flex items-center">
-          <button class="p-2 bg-stone-800 rounded-md hover:bg-stone-700">
+        <div class="flex items-center gap-4">
+          <button
+            class="p-2 bg-stone-700 rounded-md hover:bg-stone-600"
+            @click="createNewBuild"
+          >
             Create New Build
+          </button>
+          <button
+            class="p-2 bg-stone-700 rounded-md hover:bg-stone-600 disabled:bg-stone-800 disabled:text-stone-500"
+            :disabled="validatedBuild === null"
+            @click="saveBuild"
+          >
+            Save
           </button>
         </div>
       </div>
@@ -67,19 +77,33 @@
           </div>
         </div>
         <div class="flex flex-grow" v-if="editingBuild">
-          <EditRunes
-            v-model="editingBuild.runes"
-            :version="{
-              major: editingBuild.gameVersionMajor,
-              minor: editingBuild.gameVersionMinor,
-            }"
-          ></EditRunes>
+          <div>
+            <EditRunes
+              v-model="editingBuild.runes"
+              :version="editingBuild.version"
+            ></EditRunes>
+            <div class="flex gap-2 justify-center items-center mt-3">
+              <div>Version:</div>
+              <select
+                name=""
+                id=""
+                class="bg-stone-700 p-2 rounded-md"
+                v-model="editingBuild.version"
+              >
+                <option
+                  :value="version"
+                  v-for="version in [
+                    ...dataDragonStore.gameVersions.values(),
+                  ].reverse()"
+                >
+                  {{ version.major }}.{{ version.minor }}
+                </option>
+              </select>
+            </div>
+          </div>
           <EditItems
             v-model="editingBuild.items"
-            :version="{
-              major: editingBuild.gameVersionMajor,
-              minor: editingBuild.gameVersionMinor,
-            }"
+            :version="editingBuild.version"
             ref="editItems"
           ></EditItems>
         </div>
@@ -95,9 +119,10 @@ import { ref, computed, type Ref, watch, reactive } from "vue";
 import ChampionPortrait from "../components/portraits/ChampionPortrait.vue";
 
 import IconSearch from "../components/icons/IconSearch.vue";
-import type { Build, BuildMeta } from "./BuildView.vue";
+import type { Build, BuildEdit, BuildMeta, BuildRunes } from "./BuildView.vue";
 import EditRunes from "../components/edit/EditRunes.vue";
 import EditItems from "../components/edit/EditItems.vue";
+import { useStateStore } from "@/stores/state";
 
 const editItems: Ref<{ cancelEditing: Function } | null> = ref(null);
 
@@ -128,7 +153,7 @@ watch(selectedChampionId, async (championId) => {
   selectedChampionBuilds.value = data;
 });
 
-const editingBuild = ref<Build>();
+const editingBuild = ref<BuildEdit>();
 
 function selectChampion(championId: string) {
   selectedChampionId.value = championId;
@@ -146,9 +171,123 @@ async function selectBuild(build: BuildMeta) {
     return;
   }
 
-  const data: Build = await response.json();
-  editingBuild.value = data;
+  let data: Build = await response.json();
+  let dataEdit = {
+    ...data,
+    version: { major: data.gameVersionMajor, minor: data.gameVersionMinor },
+    runes: {
+      ...data.runes,
+      secondarySelections: data.runes.secondarySelections.map((val) =>
+        val < 0 ? null : val
+      ),
+    },
+  };
+  editingBuild.value = dataEdit;
 }
+
+function validateBuild(build: BuildEdit): Build | null {
+  console.log("buildEdit", build);
+  if (build.runes.primaryKey === null || build.runes.secondaryKey === null) {
+    return null;
+  }
+  if (build.runes.primarySelections.includes(null)) {
+    return null;
+  }
+
+  const numSelectedPrimary =
+    build.runes.primarySelections.reduce((val, slot) => {
+      if (slot !== null) {
+        return (val || 0) + 1;
+      } else {
+        return val;
+      }
+    }, 0) || 0;
+  const numSelectedSecondary =
+    build.runes.secondarySelections.reduce((val, slot) => {
+      if (slot !== null) {
+        return (val || 0) + 1;
+      } else {
+        return val;
+      }
+    }, 0) || 0;
+  const numStats =
+    build.runes.stats.reduce((val, slot) => {
+      if (slot !== null) {
+        return (val || 0) + 1;
+      } else {
+        return val;
+      }
+    }, 0) || 0;
+
+  console.log("numPrimary", numSelectedPrimary);
+  console.log("numSecondary", numSelectedSecondary);
+  console.log("numStats", numStats);
+
+  if (numSelectedPrimary != 4 || numSelectedSecondary != 2 || numStats != 3) {
+    return null;
+  }
+
+  let validatedRunes: BuildRunes = {
+    primaryKey: build.runes.primaryKey,
+    primarySelections: build.runes.primarySelections.map((val) => {
+      if (val === null) {
+        return -1;
+      } else {
+        return val;
+      }
+    }),
+    secondaryKey: build.runes.secondaryKey,
+    secondarySelections: build.runes.secondarySelections.map((val) => {
+      if (val === null) {
+        return -1;
+      } else {
+        return val;
+      }
+    }),
+    stats: build.runes.stats.map((val) => {
+      if (val === null) {
+        return -1;
+      } else {
+        return val;
+      }
+    }),
+  };
+  let validatedBuild: Build = {
+    champion: build.champion,
+    gameVersionMajor: build.version.major,
+    gameVersionMinor: build.version.minor,
+    runes: validatedRunes,
+    items: build.items,
+    comment: build.comment,
+  };
+  return validatedBuild;
+}
+const validatedBuild = computed(() => {
+  if (editingBuild.value) {
+    const validateddBuild = validateBuild(editingBuild.value);
+    console.log("validatedBuild", validateddBuild);
+    return validateddBuild;
+  } else {
+    return null;
+  }
+});
+
+const stateStore = useStateStore();
+
+async function saveBuild() {
+  const build = validatedBuild.value;
+  if (build) {
+    const data = JSON.stringify(build);
+    const response = await fetch(`/api/build/`, {
+      method: "POST",
+      headers: stateStore.authHeaders,
+      body: data,
+    });
+    console.log(response);
+  }
+}
+
+function createNewBuild() {}
 </script>
 
 <style scoped></style>

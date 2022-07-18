@@ -101,8 +101,7 @@ export interface Build {
 
 export interface BuildEdit {
   champion: string;
-  gameVersionMajor: number;
-  gameVersionMinor: number;
+  version: GameVersion;
   runes: BuildRunesEdit;
   items: BuildItems;
   comment: string;

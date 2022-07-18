@@ -10,6 +10,7 @@ type DDState = {
   items: Map<string, Map<string, Item>>;
   champions: Map<string, Champion>;
   versions: Map<string, string>;
+  gameVersions: Map<string, GameVersion>;
   statRunes: RuneStats;
   currentVersion: GameVersion;
 };
@@ -44,6 +45,7 @@ export interface Item {
   id: string;
   name: string;
   image: string;
+  cost: number;
   sprite: {
     sprite: string;
     x: number;
@@ -132,6 +134,10 @@ interface DataDragonItemResponse {
     sell: number;
   };
   hideFromAll?: boolean;
+  inStore?: boolean;
+  maps?: {
+    "12"?: boolean;
+  };
 }
 
 // Load stat runes
@@ -188,6 +194,7 @@ export const useDataDragonStore = defineStore({
       items: new Map(),
       champions: new Map(),
       versions: new Map(),
+      gameVersions: new Map(),
       statRunes: {},
       currentVersion: {},
     } as DDState),
@@ -286,7 +293,11 @@ export const useDataDragonStore = defineStore({
           Object.keys(data.data).forEach((key) => {
             let item = data.data[key];
 
-            if (item.hideFromAll) {
+            if (
+              item.hideFromAll ||
+              item.inStore === false ||
+              item.maps?.[12] === false
+            ) {
               return;
             }
 
@@ -301,6 +312,7 @@ export const useDataDragonStore = defineStore({
                 w: item.image.w,
                 h: item.image.h,
               },
+              cost: item.gold.total,
             });
           });
         });
@@ -333,6 +345,7 @@ export const useDataDragonStore = defineStore({
                 minor: Number(match[2]),
               };
               this.versions.set(versionToKey(version), match[0]);
+              this.gameVersions.set(versionToKey(version), version);
               this.currentVersion = version;
             }
           });
