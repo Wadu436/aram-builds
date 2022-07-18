@@ -142,17 +142,17 @@ interface DataDragonItemResponse {
 
 // Load stat runes
 const statIconAdaptiveForce =
-  "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsAdaptiveForceIcon.png";
+  "https://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsAdaptiveForceIcon.png";
 const statIconArmor =
-  "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsArmorIcon.png";
+  "https://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsArmorIcon.png";
 const statIconAttackSpeed =
-  "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsAttackSpeedIcon.png";
+  "https://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsAttackSpeedIcon.png";
 const statIconCDR =
-  "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsCDRScalingIcon.png";
+  "https://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsCDRScalingIcon.png";
 const statIconHealth =
-  "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsHealthScalingIcon.png";
+  "https://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsHealthScalingIcon.png";
 const statIconMR =
-  "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsMagicResIcon.png";
+  "https://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsMagicResIcon.png";
 
 const runeAdaptiveForce = {
   icon: statIconAdaptiveForce,
@@ -209,7 +209,7 @@ export const useDataDragonStore = defineStore({
 
       // Load champion info
       await fetch(
-        `http://ddragon.leagueoflegends.com/cdn/${urlVersion}/data/en_US/champion.json`
+        `https://ddragon.leagueoflegends.com/cdn/${urlVersion}/data/en_US/champion.json`
       )
         .then((response) => response.json())
         .then((data: DataDragonChampionResponse) =>
@@ -223,8 +223,8 @@ export const useDataDragonStore = defineStore({
                   value.title.charAt(0).toUpperCase() + value.title.slice(1),
                 blurb: value.blurb,
                 image: `https://ddragon.leagueoflegends.com/cdn/${urlVersion}/img/champion/${value.image.full}`,
-                loading: `http://ddragon.leagueoflegends.com/cdn/img/champion/loading/${value.id}_0.jpg`,
-                splash: `http://ddragon.leagueoflegends.com/cdn/img/champion/splash/${value.id}_0.jpg`,
+                loading: `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${value.id}_0.jpg`,
+                splash: `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${value.id}_0.jpg`,
                 sprite: {
                   sprite: `https://ddragon.leagueoflegends.com/cdn/${urlVersion}/img/sprite/${value.image.sprite}`,
                   x: value.image.x,
@@ -258,12 +258,12 @@ export const useDataDragonStore = defineStore({
           data.forEach((tree) => {
             runeMap.set(tree.key, {
               key: tree.key,
-              icon: `http://ddragon.leagueoflegends.com/cdn/img/${tree.icon}`,
+              icon: `https://ddragon.leagueoflegends.com/cdn/img/${tree.icon}`,
               name: tree.name,
               slots: tree.slots.map((row) =>
                 row.runes.map((slot) => ({
                   key: slot.key,
-                  icon: `http://ddragon.leagueoflegends.com/cdn/img/${slot.icon}`,
+                  icon: `https://ddragon.leagueoflegends.com/cdn/img/${slot.icon}`,
                   name: slot.name,
                   shortDesc: slot.shortDesc,
                   longDesc: slot.longDesc,
