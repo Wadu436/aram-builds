@@ -51,7 +51,7 @@ func (t JSONTime) MarshalJSON() ([]byte, error) {
 	return []byte(stamp), nil
 }
 func (items Items) MarshalJSON() ([]byte, error) {
-	var startJSON, fullbuildJSON []byte
+	var startJSON, fullbuildJSON, startCommentJSON, fullbuildCommentJSON []byte
 	var err error
 
 	if items.Start == nil {
@@ -72,7 +72,16 @@ func (items Items) MarshalJSON() ([]byte, error) {
 		}
 	}
 
-	itemsJSON := fmt.Sprintf(`{"start":%v,"startComment":"%v","fullbuild":%v,"fullbuildComment":"%v"}`, string(startJSON), items.StartComment, string(fullbuildJSON), items.FullBuildComment)
+	startCommentJSON, err = json.Marshal(items.StartComment)
+	if err != nil {
+		return nil, err
+	}
+	fullbuildCommentJSON, err = json.Marshal(items.FullBuildComment)
+	if err != nil {
+		return nil, err
+	}
+
+	itemsJSON := fmt.Sprintf(`{"start":%v,"startComment":"%v","fullbuild":%v,"fullbuildComment":"%v"}`, string(startJSON), string(startCommentJSON), string(fullbuildJSON), string(fullbuildCommentJSON))
 	return []byte(itemsJSON), nil
 }
 
