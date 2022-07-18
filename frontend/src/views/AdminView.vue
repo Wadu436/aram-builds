@@ -100,6 +100,16 @@
                 </option>
               </select>
             </div>
+            <div class="flex gap-2 justify-center items-center mt-3">
+              <div>Comment:</div>
+              <textarea
+                name=""
+                id=""
+                class="bg-stone-700 p-2 rounded-md flex-grow h-60"
+                v-model="editingBuild.comment"
+              >
+              </textarea>
+            </div>
           </div>
           <EditItems
             v-model="editingBuild.items"
@@ -142,8 +152,15 @@ const selectedChampion = computed(() => {
   return dataDragonStore.champions.get(selectedChampionId.value);
 });
 
+const editingBuild = ref<BuildEdit>();
+
 const selectedChampionBuilds: Ref<BuildMeta[]> = ref([]);
-watch(selectedChampionId, async (championId) => {
+watch(selectedChampionId, (championId) => {
+  loadBuilds(championId);
+  editingBuild.value = undefined;
+});
+
+async function loadBuilds(championId: string) {
   const response = await fetch(`/api/build/${championId}`);
   if (!response.ok) {
     return;
@@ -151,9 +168,7 @@ watch(selectedChampionId, async (championId) => {
 
   const data: BuildMeta[] = await response.json();
   selectedChampionBuilds.value = data;
-});
-
-const editingBuild = ref<BuildEdit>();
+}
 
 function selectChampion(championId: string) {
   selectedChampionId.value = championId;
@@ -187,6 +202,9 @@ async function selectBuild(build: BuildMeta) {
 
 function validateBuild(build: BuildEdit): Build | null {
   console.log("buildEdit", build);
+  if (build.champion === "") {
+    return null;
+  }
   if (build.runes.primaryKey === null || build.runes.secondaryKey === null) {
     return null;
   }
@@ -284,10 +302,32 @@ async function saveBuild() {
       body: data,
     });
     console.log(response);
+
+    await loadBuilds(selectedChampionId.value);
   }
 }
 
-function createNewBuild() {}
+function createNewBuild() {
+  let newBuild: BuildEdit = {
+    champion: selectedChampionId.value,
+    version: dataDragonStore.currentVersion,
+    runes: {
+      primaryKey: null,
+      primarySelections: [null, null, null, null],
+      secondaryKey: null,
+      secondarySelections: [null, null, null],
+      stats: [null, null, null],
+    },
+    items: {
+      start: [],
+      startComment: "",
+      fullbuild: [],
+      fullbuildComment: "",
+    },
+    comment: "",
+  };
+  editingBuild.value = newBuild;
+}
 </script>
 
 <style scoped></style>
