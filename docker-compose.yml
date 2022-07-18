@@ -12,7 +12,7 @@ services:
       - db-data:/var/lib/postgresql/data
 
   backend:
-    image: aram-builds-backend
+    image: wadu436/aram-builds:backend
     build: ./backend
     environment:
       POSTGRES_USER: postgres
@@ -35,7 +35,7 @@ services:
       - "traefik.docker.network=traefik_proxy"
 
   frontend:
-    image: aram-builds-frontend
+    image: wadu436/aram-builds:frontend
     build: ./frontend
     depends_on:
       - backend
