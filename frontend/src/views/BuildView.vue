@@ -75,9 +75,19 @@ export interface BuildRunes {
   stats: number[];
 }
 
+export interface BuildRunesEdit {
+  primaryKey: string | null;
+  primarySelections: (number | null)[];
+  secondaryKey: string | null;
+  secondarySelections: (number | null)[];
+  stats: (number | null)[];
+}
+
 export interface BuildItems {
   start: string[];
+  startComment: string;
   fullbuild: string[];
+  fullbuildComment: string;
 }
 
 export interface Build {
@@ -85,6 +95,15 @@ export interface Build {
   gameVersionMajor: number;
   gameVersionMinor: number;
   runes: BuildRunes;
+  items: BuildItems;
+  comment: string;
+}
+
+export interface BuildEdit {
+  champion: string;
+  gameVersionMajor: number;
+  gameVersionMinor: number;
+  runes: BuildRunesEdit;
   items: BuildItems;
   comment: string;
 }

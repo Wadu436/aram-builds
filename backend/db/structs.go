@@ -33,8 +33,10 @@ type Runes struct {
 }
 
 type Items struct {
-	Start     []string `json:"start"`
-	FullBuild []string `json:"fullbuild"`
+	Start            []string `json:"start"`
+	StartComment     string   `json:"startComment"`
+	FullBuild        []string `json:"fullbuild"`
+	FullBuildComment string   `json:"fullbuildComment"`
 }
 
 type Error struct {
@@ -70,7 +72,7 @@ func (items Items) MarshalJSON() ([]byte, error) {
 		}
 	}
 
-	itemsJSON := fmt.Sprintf(`{"start":%v,"fullbuild":%v}`, string(startJSON), string(fullbuildJSON))
+	itemsJSON := fmt.Sprintf(`{"start":%v,"startComment":"%v","fullbuild":%v,"fullbuildComment":"%v"}`, string(startJSON), items.StartComment, string(fullbuildJSON), items.FullBuildComment)
 	return []byte(itemsJSON), nil
 }
 

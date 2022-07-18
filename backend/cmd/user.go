@@ -10,7 +10,7 @@ func init() {
 	rootCmd.AddCommand(userCmd)
 
 	userCmd.Flags().StringVarP(&user, "new-username", "u", "", "Username for the new user")
-	userCmd.Flags().StringVarP(&user, "new-password", "p", "", "Password for the new user")
+	userCmd.Flags().StringVarP(&password, "new-password", "p", "", "Password for the new user")
 
 	userCmd.MarkFlagRequired("new-username")
 	userCmd.MarkFlagRequired("new-password")

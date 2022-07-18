@@ -1,23 +1,31 @@
 <template>
   <div class="w-11/12 text-xl flex flex-col items-center">
     <div class="text-2xl">Items</div>
-    <div class="flex flex-col bg-stone-800 w-80 p-4 rounded-md">
+    <div class="flex flex-col w-80">
       <!-- Starter -->
-      <div class="mb-8">
+      <div class="bg-stone-800 p-4 rounded-md">
         <div>Starting Items</div>
         <div class="flex">
           <div class="mr-2" v-for="itemId in build.items.start">
             <ItemPortrait :item="itemsStore?.get(itemId)" />
           </div>
         </div>
+        <!-- Comment -->
+        <div class="bg-stone-700 p-4 rounded-md mt-4 text-base">
+          {{ build.items.startComment }}
+        </div>
       </div>
       <!-- Full Build -->
-      <div>
+      <div class="bg-stone-800 p-4 rounded-md mt-4">
         <div>Full Build</div>
         <div class="flex">
           <div class="mr-2" v-for="itemId in build.items.fullbuild">
             <ItemPortrait :item="itemsStore?.get(itemId)" />
           </div>
+        </div>
+        <!-- Comment -->
+        <div class="bg-stone-700 p-4 rounded-md mt-4 text-base">
+          {{ build.items.fullbuildComment }}
         </div>
       </div>
     </div>
@@ -26,6 +34,7 @@
 
 <script setup lang="ts">
 import { useDataDragonStore, versionToKey } from "@/stores/DataDragonStore";
+import { canonicalizeString } from "@/util";
 import type { Build } from "@/views/BuildView.vue";
 import { computed, ref, watch } from "vue";
 import ItemPortrait from "../portraits/ItemPortrait.vue";
@@ -64,11 +73,6 @@ const items = computed(() => {
     return [];
   }
 });
-
-const SPECIAL_CHAR_REGEX = /[^a-zA-Z]/g;
-function canonicalizeString(str: string) {
-  return str.toLowerCase().replace(SPECIAL_CHAR_REGEX, "");
-}
 
 const search = ref("");
 

@@ -129,7 +129,6 @@ const version = computed(() => {
 });
 
 // Check if runeData needs to be loaded
-
 watch(version, (version) => {
   console.log("version", version);
   console.log("has version", dataDragonStore.runes.has(versionToKey(version)));
