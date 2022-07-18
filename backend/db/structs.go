@@ -81,7 +81,7 @@ func (items Items) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	itemsJSON := fmt.Sprintf(`{"start":%v,"startComment":"%v","fullbuild":%v,"fullbuildComment":"%v"}`, string(startJSON), string(startCommentJSON), string(fullbuildJSON), string(fullbuildCommentJSON))
+	itemsJSON := fmt.Sprintf(`{"start":%v,"startComment":%v,"fullbuild":%v,"fullbuildComment":%v}`, string(startJSON), string(startCommentJSON), string(fullbuildJSON), string(fullbuildCommentJSON))
 	return []byte(itemsJSON), nil
 }
 
