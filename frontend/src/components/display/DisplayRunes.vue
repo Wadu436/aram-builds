@@ -39,9 +39,9 @@
                 class="border-2 rounded-full border-transparent"
                 :class="{
                   'grayscale opacity-40':
-                    props.build.runes.primarySelections[j] !== i,
+                    props.build.runes.primarySelections[j + 1] !== i,
                   'border-yellow-400':
-                    props.build.runes.primarySelections[j] == i,
+                    props.build.runes.primarySelections[j + 1] == i,
                 }"
               >
                 <img class="w-10 h-10" :src="slot.icon" alt="" />
