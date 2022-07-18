@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/jackc/pgx/v4"
 	auth "github.com/wadu436/gin-auth"
 )
 
@@ -32,29 +33,13 @@ func StoreUser(user auth.User) {
 
 // Load and Store Build
 func LoadBuild(champion string, gameVersionMajor int, gameVersionMinor int) (Build, bool) {
-	var build Build
 	row := dbpool.QueryRow(context.Background(), "SELECT * FROM builds WHERE champion = $1 AND game_version_major = $2 AND game_version_minor = $3;", champion, gameVersionMajor, gameVersionMinor)
 
-	var primarySelections *[4]int = nil
-	var secondarySelections *[3]int = nil
-	var stats *[3]int = nil
-
-	if err := row.Scan(&build.Champion, &build.GameVersionMajor, &build.GameVersionMinor, (*time.Time)(&build.Mtime), &build.Runes.PrimaryKey, &primarySelections, &build.Runes.SecondaryKey, &secondarySelections, &stats, &build.Items.Start, &build.Items.FullBuild, &build.Comment, &build.Items.StartComment, &build.Items.FullBuildComment); err != nil {
-		fmt.Println(err)
+	build, err := BuildReadRow(row)
+	if err != nil {
 		return Build{}, false
 	}
 
-	if primarySelections != nil {
-		build.Runes.PrimarySelections = *primarySelections
-	}
-	if secondarySelections != nil {
-		build.Runes.SecondarySelections = *secondarySelections
-	}
-	if stats != nil {
-		build.Runes.Stats = *stats
-	}
-
-	fmt.Println(build.Runes.PrimarySelections)
 	return build, true
 }
 
@@ -129,10 +114,32 @@ func AllBuildsChampion(champion string) ([]BuildKey, error) {
 }
 
 func LatestBuild(champion string) (Build, bool) {
-	var build Build
 	row := dbpool.QueryRow(context.Background(), "SELECT * FROM builds WHERE champion = $1 ORDER BY game_version_major, game_version_minor DESC LIMIT 1;", champion)
-	if err := row.Scan(&build.Champion, &build.GameVersionMajor, &build.GameVersionMinor, (*time.Time)(&build.Mtime), &build.Runes.PrimaryKey, &build.Runes.PrimarySelections, &build.Runes.SecondaryKey, &build.Runes.SecondarySelections, &build.Runes.Stats, &build.Items.Start, &build.Items.FullBuild, &build.Comment); err != nil {
+	build, err := BuildReadRow(row)
+	if err != nil {
 		return Build{}, false
 	}
 	return build, true
+}
+
+func BuildReadRow(row pgx.Row) (Build, error) {
+	var build Build
+	var primarySelections *[4]int = nil
+	var secondarySelections *[3]int = nil
+	var stats *[3]int = nil
+
+	if err := row.Scan(&build.Champion, &build.GameVersionMajor, &build.GameVersionMinor, (*time.Time)(&build.Mtime), &build.Runes.PrimaryKey, &primarySelections, &build.Runes.SecondaryKey, &secondarySelections, &stats, &build.Items.Start, &build.Items.FullBuild, &build.Comment, &build.Items.StartComment, &build.Items.FullBuildComment); err != nil {
+		return Build{}, err
+	}
+
+	if primarySelections != nil {
+		build.Runes.PrimarySelections = *primarySelections
+	}
+	if secondarySelections != nil {
+		build.Runes.SecondarySelections = *secondarySelections
+	}
+	if stats != nil {
+		build.Runes.Stats = *stats
+	}
+	return build, nil
 }
