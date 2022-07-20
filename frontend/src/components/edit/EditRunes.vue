@@ -238,8 +238,6 @@ const runeDataArray = computed(() => {
   }
 });
 
-console.log(props.modelValue);
-
 const runeDataPrimary = computed(() => {
   if (props.modelValue.primaryKey) {
     return runeData.value?.get(props.modelValue.primaryKey);
@@ -304,15 +302,11 @@ function changeSecondaryTreeRune(row: number, slot: number) {
 
   runesCopy.secondarySelections[row] = slot;
 
-  console.log("unselect", unselect);
-
   if (unselect) {
     // Find which one to unselect
     const unselectOption = [2, 1, 0]
       .filter((val) => val !== row)
       .filter((val) => val !== lastSelectedSecondarySlot.value)[0];
-
-    console.log("unselectOption", unselectOption);
 
     // unselect it
     runesCopy.secondarySelections[unselectOption] = null;

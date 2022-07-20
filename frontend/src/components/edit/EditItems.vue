@@ -201,8 +201,6 @@ const props = defineProps<{
 const emit = defineEmits(["update:modelValue"]);
 
 function loadItems(version: GameVersion) {
-  console.log("version", version);
-  console.log("has version", dataDragonStore.items.has(versionToKey(version)));
   if (!dataDragonStore.items.has(versionToKey(version))) {
     dataDragonStore.loadItems(version);
   }

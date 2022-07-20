@@ -52,14 +52,11 @@ const version = computed(() => {
     major: props.build.gameVersionMajor,
     minor: props.build.gameVersionMinor,
   };
-  console.log("v", v);
   return v;
 });
 
 // Check if itemData needs to be loaded
 watch(version, (version) => {
-  console.log("version", version);
-  console.log("has version", dataDragonStore.items.has(versionToKey(version)));
   if (!dataDragonStore.items.has(versionToKey(version))) {
     dataDragonStore.loadItems(version);
   }

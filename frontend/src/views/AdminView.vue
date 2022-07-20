@@ -192,7 +192,6 @@ async function selectBuild(build: BuildMeta) {
 }
 
 function validateBuild(build: BuildEdit): Build | null {
-  console.log("buildEdit", build);
   if (build.champion === "") {
     return null;
   }
@@ -227,10 +226,6 @@ function validateBuild(build: BuildEdit): Build | null {
         return val;
       }
     }, 0) || 0;
-
-  console.log("numPrimary", numSelectedPrimary);
-  console.log("numSecondary", numSelectedSecondary);
-  console.log("numStats", numStats);
 
   if (numSelectedPrimary != 4 || numSelectedSecondary != 2 || numStats != 3) {
     return null;
@@ -274,7 +269,6 @@ function validateBuild(build: BuildEdit): Build | null {
 const validatedBuild = computed(() => {
   if (editingBuild.value) {
     const validateddBuild = validateBuild(editingBuild.value);
-    console.log("validatedBuild", validateddBuild);
     return validateddBuild;
   } else {
     return null;

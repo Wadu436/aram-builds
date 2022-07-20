@@ -179,13 +179,9 @@ export const useDataDragonStore = defineStore({
       // Create the cache for this version if it doesn't exist yet
       const runeMap = new Map();
       const urlVersion = this.versions.get(versionToKey(version));
-      console.log(urlVersion);
       if (!urlVersion) {
         return;
       }
-      console.log(
-        `https://ddragon.leagueoflegends.com/cdn/${urlVersion}/data/en_US/runesReforged.json`
-      );
 
       // Load rune info
       await fetch(
@@ -217,7 +213,6 @@ export const useDataDragonStore = defineStore({
       // Create the cache for this version if it doesn't exist yet
       const itemMap: Map<string, Item> = new Map();
       const urlVersion = this.versions.get(versionToKey(version));
-      console.log(urlVersion);
       if (!urlVersion) {
         return;
       }
@@ -255,11 +250,6 @@ export const useDataDragonStore = defineStore({
           });
         });
       this.items.set(versionToKey(version), itemMap);
-
-      console.log(
-        "item 1001:",
-        this.items.get(versionToKey(version))?.get("1001")
-      );
     },
 
     async initialize() {
@@ -287,9 +277,6 @@ export const useDataDragonStore = defineStore({
               this.currentVersion = version;
             }
           });
-
-          console.log(this.versions);
-          console.log(this.currentVersion);
           // this.versions = data[0];
         });
 

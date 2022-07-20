@@ -128,14 +128,11 @@ const version = computed(() => {
     major: props.build.gameVersionMajor,
     minor: props.build.gameVersionMinor,
   };
-  console.log("v", v);
   return v;
 });
 
 // Check if runeData needs to be loaded
 watch(version, (version) => {
-  console.log("version", version);
-  console.log("has version", dataDragonStore.runes.has(versionToKey(version)));
   if (!dataDragonStore.runes.has(versionToKey(version))) {
     dataDragonStore.loadRunes(version);
   }
@@ -150,8 +147,6 @@ const runeDataPrimary = computed(() =>
 const runeDataSecondary = computed(() =>
   runeData.value?.get(props.build.runes.secondaryKey)
 );
-
-console.log("build", props.build);
 </script>
 
 <style scoped></style>

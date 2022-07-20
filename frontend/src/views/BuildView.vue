@@ -76,7 +76,6 @@ const dataDragonStore = useDataDragonStore();
 const stateStore = useStateStore();
 
 const champion = computed(() => {
-  console.log("championKey:", championId);
   return dataDragonStore.champions.get(championId.value);
 });
 

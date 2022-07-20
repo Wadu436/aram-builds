@@ -58,8 +58,6 @@ const route = useRoute();
 
 const message = ref("");
 
-console.log(route.query.redirect);
-
 const onLogin = async () => {
   message.value = "";
 
@@ -95,8 +93,6 @@ const onLogin = async () => {
       redirect = route.query.redirect.toString();
     }
   }
-
-  console.log("redirecting to", redirect);
 
   router.push(redirect);
 };

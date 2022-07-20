@@ -1,8 +1,6 @@
 import { useStateStore } from "./stores/state";
 import type { BuildMeta, GameVersion, Build } from "./types";
 
-const stateStore = useStateStore();
-
 export async function getAllBuilds(): Promise<BuildMeta[]> {
   const response = await fetch(`/api/build/`);
   if (!response.ok) {
@@ -45,6 +43,7 @@ export async function getBuild(
 }
 
 export async function postBuild(build: Build): Promise<void> {
+  const stateStore = useStateStore();
   const data = JSON.stringify(build);
   const response = await fetch(`/api/build/`, {
     method: "POST",
