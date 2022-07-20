@@ -5,7 +5,7 @@ module.exports = {
   theme: {
     fontFamily: {
       sans: ["Roboto"],
-      title: ["Roboto Condensed"]
+      title: ["Roboto Condensed"],
     },
     extend: {
       gridTemplateColumns: {

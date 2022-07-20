@@ -1,3 +1,5 @@
+import type { RuneTree, Item, Champion, GameVersion, RuneStats } from "@/types";
+import { versionToKey } from "@/util";
 import { defineStore } from "pinia";
 
 const DATA_DRAGON_VERSIONS =
@@ -15,66 +17,6 @@ type DDState = {
   currentVersion: GameVersion;
 };
 
-export interface GameVersion {
-  major: number;
-  minor: number;
-}
-
-export function versionToKey(version: GameVersion) {
-  return `${version.major}_${version.minor}`;
-}
-
-export interface Champion {
-  id: string;
-  name: string;
-  title: string;
-  blurb: string;
-  image: string;
-  loading: string;
-  splash: string;
-  sprite: {
-    sprite: string;
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-  };
-}
-
-export interface Item {
-  id: string;
-  name: string;
-  image: string;
-  cost: number;
-  sprite: {
-    sprite: string;
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-  };
-}
-
-export interface RuneTree {
-  key: string;
-  icon: string;
-  name: string;
-  slots: {
-    key: string;
-    icon: string;
-    name: string;
-    shortDesc: string;
-    longDesc: string;
-  }[][];
-}
-
-export interface RuneStats {
-  slots: {
-    icon: string;
-    key: string;
-    name: string;
-  }[][];
-}
 interface DataDragonChampionResponse {
   data: {
     [key: string]: {
@@ -291,7 +233,7 @@ export const useDataDragonStore = defineStore({
         .then((response) => response.json())
         .then((data: { data: { [key: string]: DataDragonItemResponse } }) => {
           Object.keys(data.data).forEach((key) => {
-            let item = data.data[key];
+            const item = data.data[key];
 
             if (
               item.hideFromAll ||

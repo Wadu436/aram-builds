@@ -16,7 +16,7 @@ app.use(router);
 const dataDragonStore = useDataDragonStore();
 const stateStore = useStateStore();
 
-router.beforeEach((to, from) => {
+router.beforeEach((to) => {
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!stateStore.user.authenticated) {
       return { name: "login", query: { redirect: to.path } };

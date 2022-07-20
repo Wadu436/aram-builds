@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Champion } from "@/stores/DataDragonStore";
+import type { Champion } from "@/types";
 
 const props = defineProps<{
   champion: Champion;

@@ -26,7 +26,11 @@
                 id="versions"
                 v-model="currentVersion"
               >
-                <option v-for="build in builds" :value="build">
+                <option
+                  v-for="build in builds"
+                  :value="build"
+                  :key="build.major + '_' + build.minor"
+                >
                   {{ build.major }}.{{ build.minor }}
                 </option>
               </select>
@@ -55,57 +59,11 @@
 <script setup lang="ts">
 import { useDataDragonStore } from "@/stores/DataDragonStore";
 import { computed, ref, watch, type Ref } from "vue";
-import type { GameVersion } from "@/stores/DataDragonStore";
+import type { Build, BuildMeta, GameVersion } from "@/types";
 import { useStateStore } from "@/stores/state";
 import DisplayRunes from "../components/display/DisplayRunes.vue";
 import DisplayItems from "../components/display/DisplayItems.vue";
 import IconBack from "../components/icons/IconBack.vue";
-
-export interface BuildMeta {
-  champion: string;
-  gameVersionMajor: number;
-  gameVersionMinor: number;
-}
-
-export interface BuildRunes {
-  primaryKey: string;
-  primarySelections: number[];
-  secondaryKey: string;
-  secondarySelections: number[];
-  stats: number[];
-}
-
-export interface BuildRunesEdit {
-  primaryKey: string | null;
-  primarySelections: (number | null)[];
-  secondaryKey: string | null;
-  secondarySelections: (number | null)[];
-  stats: (number | null)[];
-}
-
-export interface BuildItems {
-  start: string[];
-  startComment: string;
-  fullbuild: string[];
-  fullbuildComment: string;
-}
-
-export interface Build {
-  champion: string;
-  gameVersionMajor: number;
-  gameVersionMinor: number;
-  runes: BuildRunes;
-  items: BuildItems;
-  comment: string;
-}
-
-export interface BuildEdit {
-  champion: string;
-  version: GameVersion;
-  runes: BuildRunesEdit;
-  items: BuildItems;
-  comment: string;
-}
 
 const props = defineProps({
   champion: String,
@@ -161,12 +119,12 @@ async function setupBuilds() {
 
   const urlLatest = `/api/build/${championId.value}/latest`;
   (async () => {
-    let response = await fetch(urlLatest);
+    const response = await fetch(urlLatest);
     if (!response.ok) {
       stateStore.loading = false;
       return;
     }
-    let data: Build = await response.json();
+    const data: Build = await response.json();
     currentBuild.value = data;
     currentVersion.value = {
       major: data.gameVersionMajor,

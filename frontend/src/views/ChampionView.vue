@@ -12,7 +12,7 @@ import type { BuildMeta } from "./BuildView.vue";
 const searchString = ref("");
 const dataDragonStore = useDataDragonStore();
 const filteredChampions = computed(() => {
-  let champions = [...dataDragonStore.champions.values()];
+  const champions = [...dataDragonStore.champions.values()];
 
   return champions.filter((c) =>
     canonicalizeString(c.name).includes(canonicalizeString(searchString.value))

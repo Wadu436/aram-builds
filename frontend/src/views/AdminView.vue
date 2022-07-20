@@ -22,6 +22,7 @@
             v-for="champion in filteredChampions"
             class="block w-full"
             @click="() => selectChampion(champion.id)"
+            :key="champion.id"
           >
             <div class="flex items-center p-4 m-2 bg-stone-800 rounded-md">
               <ChampionPortrait :champion="champion" />
@@ -70,6 +71,7 @@
                 class="px-4 py-2 bg-stone-800 rounded-md mt-2 cursor-pointer hover:bg-stone-700 flex items-center justify-center"
                 v-for="build in selectedChampionBuilds"
                 @click="() => selectBuild(build)"
+                :key="build.gameVersionMajor + '_' + build.gameVersionMinor"
               >
                 {{ build.gameVersionMajor }}.{{ build.gameVersionMinor }}
               </div>
@@ -95,6 +97,7 @@
                   v-for="version in [
                     ...dataDragonStore.gameVersions.values(),
                   ].reverse()"
+                  :key="version.major + '_' + version.minor"
                 >
                   {{ version.major }}.{{ version.minor }}
                 </option>
@@ -125,16 +128,16 @@
 <script setup lang="ts">
 import { useDataDragonStore } from "@/stores/DataDragonStore";
 import { canonicalizeString } from "@/util";
-import { ref, computed, type Ref, watch, reactive } from "vue";
+import { ref, computed, type Ref, watch } from "vue";
 import ChampionPortrait from "../components/portraits/ChampionPortrait.vue";
 
 import IconSearch from "../components/icons/IconSearch.vue";
-import type { Build, BuildEdit, BuildMeta, BuildRunes } from "./BuildView.vue";
+import type { Build, BuildEdit, BuildMeta, BuildRunes } from "@/types";
 import EditRunes from "../components/edit/EditRunes.vue";
 import EditItems from "../components/edit/EditItems.vue";
 import { useStateStore } from "@/stores/state";
 
-const editItems: Ref<{ cancelEditing: Function } | null> = ref(null);
+const editItems: Ref<{ cancelEditing: () => void } | null> = ref(null);
 
 const searchString = ref("");
 const dataDragonStore = useDataDragonStore();
@@ -186,8 +189,8 @@ async function selectBuild(build: BuildMeta) {
     return;
   }
 
-  let data: Build = await response.json();
-  let dataEdit = {
+  const data: Build = await response.json();
+  const dataEdit = {
     ...data,
     version: { major: data.gameVersionMajor, minor: data.gameVersionMinor },
     runes: {
@@ -245,7 +248,7 @@ function validateBuild(build: BuildEdit): Build | null {
     return null;
   }
 
-  let validatedRunes: BuildRunes = {
+  const validatedRunes: BuildRunes = {
     primaryKey: build.runes.primaryKey,
     primarySelections: build.runes.primarySelections.map((val) => {
       if (val === null) {
@@ -270,7 +273,7 @@ function validateBuild(build: BuildEdit): Build | null {
       }
     }),
   };
-  let validatedBuild: Build = {
+  const validatedBuild: Build = {
     champion: build.champion,
     gameVersionMajor: build.version.major,
     gameVersionMinor: build.version.minor,
@@ -308,7 +311,7 @@ async function saveBuild() {
 }
 
 function createNewBuild() {
-  let newBuild: BuildEdit = {
+  const newBuild: BuildEdit = {
     champion: selectedChampionId.value,
     version: dataDragonStore.currentVersion,
     runes: {

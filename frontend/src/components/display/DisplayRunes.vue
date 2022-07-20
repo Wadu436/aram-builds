@@ -17,7 +17,7 @@
           <!-- Keystone -->
           <div class="flex justify-evenly mb-4">
             <!-- Slots -->
-            <div v-for="(slot, i) in runeDataPrimary.slots[0]">
+            <div v-for="(slot, i) in runeDataPrimary.slots[0]" :key="i">
               <div
                 :class="{
                   'grayscale opacity-40':
@@ -32,9 +32,10 @@
           <div
             class="flex justify-evenly mt-4"
             v-for="(row, j) in runeDataPrimary.slots.slice(1)"
+            :key="j"
           >
             <!-- Slots -->
-            <div v-for="(slot, i) in row">
+            <div v-for="(slot, i) in row" :key="i">
               <div
                 class="border-2 rounded-full border-transparent"
                 :class="{
@@ -66,9 +67,10 @@
           <div
             class="flex justify-evenly mb-4"
             v-for="(row, j) in runeDataSecondary.slots.slice(1)"
+            :key="j"
           >
             <!-- Slots -->
-            <div v-for="(slot, i) in row">
+            <div v-for="(slot, i) in row" :key="i">
               <div
                 class="border-2 rounded-full border-transparent"
                 :class="{
@@ -90,9 +92,10 @@
           <div
             class="flex justify-evenly mb-4"
             v-for="(row, j) in dataDragonStore.statRunes.slots"
+            :key="j"
           >
             <!-- Slots -->
-            <div v-for="(slot, i) in row">
+            <div v-for="(slot, i) in row" :key="i">
               <div
                 :class="{
                   'grayscale opacity-40': props.build.runes.stats[j] !== i,
@@ -111,9 +114,10 @@
 </template>
 
 <script setup lang="ts">
-import { useDataDragonStore, versionToKey } from "@/stores/DataDragonStore";
-import type { Build } from "@/views/BuildView.vue";
-import { computed, reactive, toRef, watch } from "vue";
+import { useDataDragonStore } from "@/stores/DataDragonStore";
+import type { Build } from "@/types";
+import { versionToKey } from "@/util";
+import { computed, watch } from "vue";
 
 const dataDragonStore = useDataDragonStore();
 

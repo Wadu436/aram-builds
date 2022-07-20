@@ -57,7 +57,7 @@
             </button>
           </div>
           <draggable
-            v-model="modelValue.start"
+            :list="modelValue.start"
             :group="{ name: 'itemsBox', pull: true, put: true }"
             class="mr-2 flex min-h-[2rem] bg-stone-700 rounded-md p-2 gap-2 flex-wrap"
             @dragstart="dragging = true"
@@ -122,7 +122,7 @@
             </button>
           </div>
           <draggable
-            v-model="modelValue.fullbuild"
+            :list="modelValue.fullbuild"
             :group="{ name: 'itemsBox', pull: true, put: true }"
             class="mr-2 flex min-h-[2rem] bg-stone-700 rounded-md p-2 gap-2 flex-wrap"
             @dragstart="dragging = true"
@@ -183,14 +183,11 @@
 </template>
 
 <script setup lang="ts">
-import {
-  useDataDragonStore,
-  versionToKey,
-  type GameVersion,
-} from "@/stores/DataDragonStore";
+import { useDataDragonStore } from "@/stores/DataDragonStore";
+import { versionToKey } from "@/util";
+import type { GameVersion, BuildItems } from "@/types";
 import { canonicalizeString } from "@/util";
-import type { BuildItems } from "@/views/BuildView.vue";
-import { computed, ref, toRef, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import ItemPortrait from "../portraits/ItemPortrait.vue";
 import draggable from "vuedraggable";
 import IconBin from "../icons/IconBin.vue";
@@ -247,17 +244,15 @@ const filteredItems = computed(() => {
   });
 });
 
-const version = toRef(props, "version");
-
 function changeStartComment() {
-  let itemsCopy = { ...props.modelValue };
+  const itemsCopy = { ...props.modelValue };
   itemsCopy.startComment = editingStartCommentText.value;
   emit("update:modelValue", itemsCopy);
   editingStartComment.value = false;
 }
 
 function changeFullBuildComment() {
-  let itemsCopy = { ...props.modelValue };
+  const itemsCopy = { ...props.modelValue };
   itemsCopy.fullbuildComment = editingFullCommentText.value;
   emit("update:modelValue", itemsCopy);
   editingFullComment.value = false;
@@ -269,14 +264,14 @@ function cancelEditing() {
 }
 
 function emptyStart() {
-  let itemsCopy = { ...props.modelValue };
+  const itemsCopy = { ...props.modelValue };
   itemsCopy.start = [];
   emit("update:modelValue", itemsCopy);
   editingStartComment.value = false;
 }
 
 function emptyFullBuild() {
-  let itemsCopy = { ...props.modelValue };
+  const itemsCopy = { ...props.modelValue };
   itemsCopy.fullbuild = [];
   emit("update:modelValue", itemsCopy);
   editingStartComment.value = false;

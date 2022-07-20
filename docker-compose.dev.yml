@@ -13,27 +13,28 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
 
+  backend:
+    image: aram-builds-backend
+    build: ./backend
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DATABASE: builds
+      POSTGRES_ADDRESS: db:5432
+      BIND_ADDRESS: :8080
+    depends_on:
+      - db
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.builds_backend.rule=PathPrefix(`/api/`)"
+      - "traefik.http.routers.builds_backend.entrypoints=web"
+      - "traefik.http.services.builds_backend.loadbalancer.server.port=80"
+    ports:
+      - 8080:8080
+
 volumes:
   db-data:
 
-    # backend:
-    #   image: aram-builds-backend
-    #   build: ./backend
-    #   environment:
-    #     POSTGRES_USER: postgres
-    #     POSTGRES_PASSWORD: postgres
-    #     POSTGRES_DATABASE: builds
-    #     POSTGRES_ADDRESS: db:5432
-    #     BIND_ADDRESS: :8080
-    #   depends_on:
-    #     - db
-    #   labels:
-    #     - "traefik.enable=true"
-    #     - "traefik.http.routers.builds_backend.rule=PathPrefix(`/api/`)"
-    #     - "traefik.http.routers.builds_backend.entrypoints=web"
-    #     - "traefik.http.services.builds_backend.loadbalancer.server.port=80"
-    #   ports:
-    #     - 8080:8080
     # frontend:
     #   image: aram-builds-frontend
     #   build: ./frontend

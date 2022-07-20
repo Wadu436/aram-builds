@@ -1,21 +1,17 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from "vue-router";
-import { ref } from "vue";
+import { RouterView } from "vue-router";
 import LoadingOverlay from "./components/overlays/LoadingOverlay.vue";
-import { useStateStore } from "./stores/state";
 
-const open = ref(false);
+// const open = ref(false);
 
-const stateStore = useStateStore();
+// const navItems = [
+//   { to: "/", title: "Champions" },
+//   // { to: "/about", title: "About" },
+// ];
 
-const navItems = [
-  { to: "/", title: "Champions" },
-  // { to: "/about", title: "About" },
-];
-
-function toggle() {
-  open.value = !open.value;
-}
+// function toggle() {
+//   open.value = !open.value;
+// }
 </script>
 
 <template>
