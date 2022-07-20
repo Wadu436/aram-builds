@@ -7,6 +7,7 @@ import ChampionPortrait from "../components/portraits/ChampionPortrait.vue";
 
 import { canonicalizeString } from "../util";
 import IconSearch from "../components/icons/IconSearch.vue";
+import type { BuildMeta } from "./BuildView.vue";
 
 const searchString = ref("");
 const dataDragonStore = useDataDragonStore();
@@ -17,6 +18,15 @@ const filteredChampions = computed(() => {
     canonicalizeString(c.name).includes(canonicalizeString(searchString.value))
   );
 });
+
+const champBuilds = ref<Map<string, BuildMeta>>(new Map());
+(async () => {
+  const response = await fetch("/api/build/");
+  const data: BuildMeta[] = await response.json();
+  data.forEach((meta) => {
+    champBuilds.value.set(meta.champion, meta);
+  });
+})();
 </script>
 
 <template>
@@ -49,7 +59,10 @@ const filteredChampions = computed(() => {
         <div
           class="py-5 bg-stone-800 border-4 border-transparent hover:bg-stone-700 hover:border-stone-400 rounded-md flex flex-col items-center"
         >
-          <ChampionPortrait :champion="champion" />
+          <ChampionPortrait
+            :gray="!champBuilds.has(champion.id)"
+            :champion="champion"
+          />
           <div
             class="text-lg mt-1 max-w-full overflow-hidden overflow-ellipsis whitespace-nowrap"
           >
