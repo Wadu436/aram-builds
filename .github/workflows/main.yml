@@ -50,7 +50,6 @@ jobs:
           tags: wadu436/aram-builds:frontend
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          load: true
 
       # Send compose file to the server
       - name: send compose file to server (rsync)
