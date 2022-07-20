@@ -7,7 +7,9 @@ import ChampionPortrait from "../components/portraits/ChampionPortrait.vue";
 
 import { canonicalizeString } from "../util";
 import IconSearch from "../components/icons/IconSearch.vue";
-import type { BuildMeta } from "./BuildView.vue";
+import type { BuildMeta } from "@/types";
+
+import { getAllBuilds } from "@/api";
 
 const searchString = ref("");
 const dataDragonStore = useDataDragonStore();
@@ -20,13 +22,12 @@ const filteredChampions = computed(() => {
 });
 
 const champBuilds = ref<Map<string, BuildMeta>>(new Map());
-(async () => {
-  const response = await fetch("/api/build/");
-  const data: BuildMeta[] = await response.json();
-  data.forEach((meta) => {
+
+getAllBuilds().then((metas) => {
+  metas.forEach((meta) => {
     champBuilds.value.set(meta.champion, meta);
   });
-})();
+});
 </script>
 
 <template>

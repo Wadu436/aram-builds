@@ -2,10 +2,6 @@ import type { RuneTree, Item, Champion, GameVersion, RuneStats } from "@/types";
 import { versionToKey } from "@/util";
 import { defineStore } from "pinia";
 
-const DATA_DRAGON_VERSIONS =
-  "https://ddragon.leagueoflegends.com/api/versions.json";
-const VERSION_REGEX = /^(\d+)\.(\d+)\.\d+$/;
-
 type DDState = {
   // first index is version (e.g. 12.13), second is tree key (e.g. Domination)
   runes: Map<string, Map<string, RuneTree>>;
@@ -276,11 +272,11 @@ export const useDataDragonStore = defineStore({
       };
 
       // Get Versions
-      await fetch(DATA_DRAGON_VERSIONS)
+      await fetch("https://ddragon.leagueoflegends.com/api/versions.json")
         .then((response) => response.json())
         .then((data: [string]) => {
           data.reverse().forEach((version) => {
-            const match = version.match(VERSION_REGEX);
+            const match = version.match(/^(\d+)\.(\d+)\.\d+$/);
             if (match) {
               const version = {
                 major: Number(match[1]),

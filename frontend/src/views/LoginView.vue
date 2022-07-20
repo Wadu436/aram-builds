@@ -42,6 +42,7 @@
 </template>
 
 <script setup lang="ts">
+import { verifyHeaders } from "@/api";
 import { useStateStore } from "@/stores/state";
 import { createAuthHeaders } from "@/util";
 import { ref } from "vue";
@@ -74,16 +75,9 @@ const onLogin = async () => {
     return;
   }
 
-  const response = await fetch("/api/auth/check/", {
-    method: "POST",
-    headers: createAuthHeaders(username.value, password.value),
-  });
-  if (!response.ok) {
-    if (response.status == 401) {
-      message.value = "Invalid username or password";
-    } else {
-      message.value = `${response.status}: ${response.statusText}`;
-    }
+  const headers = createAuthHeaders(username.value, password.value);
+  if (!(await verifyHeaders(headers))) {
+    message.value = `Invalid username or password`;
     return;
   }
 

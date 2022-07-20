@@ -135,7 +135,8 @@ import IconSearch from "../components/icons/IconSearch.vue";
 import type { Build, BuildEdit, BuildMeta, BuildRunes } from "@/types";
 import EditRunes from "../components/edit/EditRunes.vue";
 import EditItems from "../components/edit/EditItems.vue";
-import { useStateStore } from "@/stores/state";
+
+import { getBuild, getBuilds, postBuild } from "@/api";
 
 const editItems: Ref<{ cancelEditing: () => void } | null> = ref(null);
 
@@ -164,13 +165,7 @@ watch(selectedChampionId, (championId) => {
 });
 
 async function loadBuilds(championId: string) {
-  const response = await fetch(`/api/build/${championId}`);
-  if (!response.ok) {
-    return;
-  }
-
-  const data: BuildMeta[] = await response.json();
-  selectedChampionBuilds.value = data;
+  selectedChampionBuilds.value = await getBuilds(championId);
 }
 
 function selectChampion(championId: string) {
@@ -179,17 +174,10 @@ function selectChampion(championId: string) {
 }
 
 async function selectBuild(build: BuildMeta) {
-  //   editItems.value?.cancelEditing();
-  console.log("editItems", editItems.value);
-  editItems.value?.cancelEditing();
-  const response = await fetch(
-    `/api/build/${build.champion}/${build.gameVersionMajor}/${build.gameVersionMinor}`
-  );
-  if (!response.ok) {
-    return;
-  }
-
-  const data: Build = await response.json();
+  const data: Build = await getBuild(build.champion, {
+    major: build.gameVersionMajor,
+    minor: build.gameVersionMinor,
+  });
   const dataEdit = {
     ...data,
     version: { major: data.gameVersionMajor, minor: data.gameVersionMinor },
@@ -293,19 +281,10 @@ const validatedBuild = computed(() => {
   }
 });
 
-const stateStore = useStateStore();
-
 async function saveBuild() {
   const build = validatedBuild.value;
   if (build) {
-    const data = JSON.stringify(build);
-    const response = await fetch(`/api/build/`, {
-      method: "POST",
-      headers: stateStore.authHeaders,
-      body: data,
-    });
-    console.log(response);
-
+    await postBuild(build);
     await loadBuilds(selectedChampionId.value);
   }
 }

@@ -59,11 +59,12 @@
 <script setup lang="ts">
 import { useDataDragonStore } from "@/stores/DataDragonStore";
 import { computed, ref, watch, type Ref } from "vue";
-import type { Build, BuildMeta, GameVersion } from "@/types";
+import type { Build, GameVersion } from "@/types";
 import { useStateStore } from "@/stores/state";
 import DisplayRunes from "../components/display/DisplayRunes.vue";
 import DisplayItems from "../components/display/DisplayItems.vue";
 import IconBack from "../components/icons/IconBack.vue";
+import { getBuild, getBuilds, getLatestBuild } from "@/api";
 
 const props = defineProps({
   champion: String,
@@ -85,73 +86,58 @@ const currentBuild: Ref<Build | null> = ref(null);
 
 async function setupBuilds() {
   stateStore.loading = true;
-  const url = `/api/build/${championId.value}`;
-  fetch(url)
-    .then((response) => response.json())
-    .then((data: BuildMeta[]) => {
-      builds.value = data.map((meta) => ({
-        major: meta.gameVersionMajor,
-        minor: meta.gameVersionMinor,
-      }));
-      builds.value
-        .sort((a, b) => {
-          if (a.major == b.major) {
-            if (a.minor == b.minor) {
-              // a == b
-              return 0;
-            } else if (a.minor > b.minor) {
-              // a > b
-              return 1;
-            } else {
-              // a < b
-              return -1;
-            }
-          } else if (a.major > b.major) {
-            // a > b
-            return 1;
-          } else {
-            // a < b
-            return -1;
-          }
-        })
-        .reverse();
-    });
+  const buildsTemp = (await getBuilds(championId.value)).map((meta) => ({
+    major: meta.gameVersionMajor,
+    minor: meta.gameVersionMinor,
+  }));
+  buildsTemp
+    .sort((a, b) => {
+      if (a.major == b.major) {
+        if (a.minor == b.minor) {
+          // a == b
+          return 0;
+        } else if (a.minor > b.minor) {
+          // a > b
+          return 1;
+        } else {
+          // a < b
+          return -1;
+        }
+      } else if (a.major > b.major) {
+        // a > b
+        return 1;
+      } else {
+        // a < b
+        return -1;
+      }
+    })
+    .reverse();
+  builds.value = buildsTemp;
 
-  const urlLatest = `/api/build/${championId.value}/latest`;
-  (async () => {
-    const response = await fetch(urlLatest);
-    if (!response.ok) {
-      stateStore.loading = false;
-      return;
-    }
-    const data: Build = await response.json();
-    currentBuild.value = data;
+  getLatestBuild(championId.value).then((build) => {
+    currentBuild.value = build;
     currentVersion.value = {
-      major: data.gameVersionMajor,
-      minor: data.gameVersionMinor,
+      major: build.gameVersionMajor,
+      minor: build.gameVersionMinor,
     };
     stateStore.loading = false;
-  })();
+  });
 }
 
-async function fetchBuild(version: GameVersion | null) {
+async function loadBuild(version: GameVersion | null) {
   //   let url = `/api/build/${championId.value}/latest`;
-  let url;
+  let build;
   if (version) {
-    url = `/api/build/${championId.value}/${version.major}/${version.minor}`;
+    build = await getBuild(championId.value, version);
   } else {
-    url = `/api/build/${championId.value}/latest`;
+    build = await getLatestBuild(championId.value);
   }
 
-  fetch(url)
-    .then((response) => response.json())
-    .then((data: Build) => {
-      currentBuild.value = data;
-      currentVersion.value = {
-        major: data.gameVersionMajor,
-        minor: data.gameVersionMinor,
-      };
-    });
+  currentBuild.value = build;
+  currentVersion.value = {
+    major: build.gameVersionMajor,
+    minor: build.gameVersionMinor,
+  };
 }
 
 watch(currentVersion, (newVersion, oldVersion) => {
@@ -160,7 +146,7 @@ watch(currentVersion, (newVersion, oldVersion) => {
     oldVersion?.minor !== newVersion?.minor
   ) {
     if (newVersion) {
-      fetchBuild(newVersion);
+      loadBuild(newVersion);
     }
   }
 });

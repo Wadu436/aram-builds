@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Item } from "@/stores/DataDragonStore";
+import type { Item } from "@/types";
 import { computed } from "vue";
 import Popper from "vue3-popper";
 
