@@ -12,7 +12,7 @@ import type { Champion } from "@/stores/DataDragonStore";
 
 const props = defineProps<{
   champion: Champion;
-  gray: boolean;
+  gray?: boolean;
 }>();
 </script>
 
