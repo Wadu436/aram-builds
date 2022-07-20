@@ -41,7 +41,6 @@ jobs:
           tags: wadu436/aram-builds:backend
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          load: true
 
       - name: build frontend image
         uses: docker/build-push-action@v2
