@@ -12,6 +12,23 @@ export function canonicalizeString(str: string) {
   return str.toLowerCase().replace(SPECIAL_CHAR_REGEX, "");
 }
 
-export function versionToKey(version: GameVersion) {
-  return `${version.major}_${version.minor}`;
+function splitVersion(version: GameVersion): [number, number] {
+  const [majorString, minorString] = version.split(".");
+  const major = Number(majorString);
+  const minor = Number(minorString);
+  return [major, minor];
+}
+
+export function versionSortKey(a: GameVersion, b: GameVersion) {
+  const [aMajor, aMinor] = splitVersion(a);
+  const [bMajor, bMinor] = splitVersion(b);
+
+  if (aMajor < bMajor || (aMajor == bMajor && aMinor < bMinor)) {
+    return -1;
+  }
+  if (aMajor > bMajor || (aMajor == bMajor && aMinor > bMinor)) {
+    return 1;
+  }
+  // a must be equal to b
+  return 0;
 }

@@ -19,22 +19,11 @@ export async function getBuilds(championId: string): Promise<BuildMeta[]> {
   return await response.json();
 }
 
-export async function getLatestBuild(championId: string): Promise<Build> {
-  const response = await fetch(`/api/build/${championId}/latest`);
-  if (!response.ok) {
-    throw response.status;
-  }
-
-  return await response.json();
-}
-
 export async function getBuild(
   championId: string,
   version: GameVersion
 ): Promise<Build> {
-  const response = await fetch(
-    `/api/build/${championId}/${version.major}/${version.minor}`
-  );
+  const response = await fetch(`/api/build/${championId}/${version}`);
   if (!response.ok) {
     throw response.status;
   }

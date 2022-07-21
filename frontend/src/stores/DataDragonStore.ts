@@ -1,5 +1,4 @@
 import type { RuneTree, Item, Champion, GameVersion, RuneStats } from "@/types";
-import { versionToKey } from "@/util";
 import { defineStore } from "pinia";
 
 type DDState = {
@@ -7,8 +6,7 @@ type DDState = {
   runes: Map<string, Map<string, RuneTree>>;
   items: Map<string, Map<string, Item>>;
   champions: Map<string, Champion>;
-  versions: Map<string, string>;
-  gameVersions: Map<string, GameVersion>;
+  versions: Map<GameVersion, string>;
   statRunes: RuneStats;
   currentVersion: GameVersion;
 };
@@ -132,7 +130,6 @@ export const useDataDragonStore = defineStore({
       items: new Map(),
       champions: new Map(),
       versions: new Map(),
-      gameVersions: new Map(),
       statRunes: {},
       currentVersion: {},
     } as DDState),
@@ -143,7 +140,7 @@ export const useDataDragonStore = defineStore({
   },
   actions: {
     async loadChampions() {
-      const urlVersion = this.versions.get(versionToKey(this.currentVersion));
+      const urlVersion = this.versions.get(this.currentVersion);
 
       // Load champion info
       await fetch(
@@ -178,7 +175,7 @@ export const useDataDragonStore = defineStore({
     async loadRunes(version: GameVersion) {
       // Create the cache for this version if it doesn't exist yet
       const runeMap = new Map();
-      const urlVersion = this.versions.get(versionToKey(version));
+      const urlVersion = this.versions.get(version);
       if (!urlVersion) {
         return;
       }
@@ -206,13 +203,13 @@ export const useDataDragonStore = defineStore({
             });
           });
         });
-      this.runes.set(versionToKey(version), runeMap);
+      this.runes.set(version, runeMap);
     },
 
     async loadItems(version: GameVersion) {
       // Create the cache for this version if it doesn't exist yet
       const itemMap: Map<string, Item> = new Map();
-      const urlVersion = this.versions.get(versionToKey(version));
+      const urlVersion = this.versions.get(version);
       if (!urlVersion) {
         return;
       }
@@ -249,7 +246,7 @@ export const useDataDragonStore = defineStore({
             });
           });
         });
-      this.items.set(versionToKey(version), itemMap);
+      this.items.set(version, itemMap);
     },
 
     async initialize() {
@@ -268,13 +265,9 @@ export const useDataDragonStore = defineStore({
           data.reverse().forEach((version) => {
             const match = version.match(/^(\d+)\.(\d+)\.\d+$/);
             if (match) {
-              const version = {
-                major: Number(match[1]),
-                minor: Number(match[2]),
-              };
-              this.versions.set(versionToKey(version), match[0]);
-              this.gameVersions.set(versionToKey(version), version);
-              this.currentVersion = version;
+              const v: GameVersion = `${Number(match[1])}.${Number(match[2])}`;
+              this.versions.set(v, match[0]);
+              this.currentVersion = v;
             }
           });
           // this.versions = data[0];

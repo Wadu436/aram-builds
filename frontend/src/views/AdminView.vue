@@ -71,9 +71,9 @@
                 class="px-4 py-2 bg-stone-800 rounded-md mt-2 cursor-pointer hover:bg-stone-700 flex items-center justify-center"
                 v-for="build in selectedChampionBuilds"
                 @click="() => selectBuild(build)"
-                :key="build.gameVersionMajor + '_' + build.gameVersionMinor"
+                :key="build.gameVersion"
               >
-                {{ build.gameVersionMajor }}.{{ build.gameVersionMinor }}
+                {{ build.gameVersion }}
               </div>
             </div>
           </div>
@@ -95,11 +95,11 @@
                 <option
                   :value="version"
                   v-for="version in [
-                    ...dataDragonStore.gameVersions.values(),
+                    ...dataDragonStore.versions.keys(),
                   ].reverse()"
-                  :key="version.major + '_' + version.minor"
+                  :key="version"
                 >
-                  {{ version.major }}.{{ version.minor }}
+                  {{ version }}
                 </option>
               </select>
             </div>
@@ -174,13 +174,10 @@ function selectChampion(championId: string) {
 }
 
 async function selectBuild(build: BuildMeta) {
-  const data: Build = await getBuild(build.champion, {
-    major: build.gameVersionMajor,
-    minor: build.gameVersionMinor,
-  });
+  const data: Build = await getBuild(build.champion, build.gameVersion);
   const dataEdit = {
     ...data,
-    version: { major: data.gameVersionMajor, minor: data.gameVersionMinor },
+    version: data.gameVersion,
     runes: {
       ...data.runes,
       secondarySelections: data.runes.secondarySelections.map((val) =>
@@ -258,8 +255,7 @@ function validateBuild(build: BuildEdit): Build | null {
   };
   const validatedBuild: Build = {
     champion: build.champion,
-    gameVersionMajor: build.version.major,
-    gameVersionMinor: build.version.minor,
+    gameVersion: build.version,
     runes: validatedRunes,
     items: build.items,
     comment: build.comment,

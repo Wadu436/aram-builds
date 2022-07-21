@@ -116,7 +116,6 @@
 <script setup lang="ts">
 import { useDataDragonStore } from "@/stores/DataDragonStore";
 import type { Build } from "@/types";
-import { versionToKey } from "@/util";
 import { computed, watch } from "vue";
 
 const dataDragonStore = useDataDragonStore();
@@ -124,23 +123,17 @@ const dataDragonStore = useDataDragonStore();
 const props = defineProps<{ build: Build }>();
 
 const version = computed(() => {
-  const v = {
-    major: props.build.gameVersionMajor,
-    minor: props.build.gameVersionMinor,
-  };
-  return v;
+  return props.build.gameVersion;
 });
 
 // Check if runeData needs to be loaded
 watch(version, (version) => {
-  if (!dataDragonStore.runes.has(versionToKey(version))) {
+  if (!dataDragonStore.runes.has(version)) {
     dataDragonStore.loadRunes(version);
   }
 });
 
-const runeData = computed(() =>
-  dataDragonStore.runes.get(versionToKey(version.value))
-);
+const runeData = computed(() => dataDragonStore.runes.get(version.value));
 const runeDataPrimary = computed(() =>
   runeData.value?.get(props.build.runes.primaryKey)
 );

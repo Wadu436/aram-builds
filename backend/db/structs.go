@@ -9,19 +9,17 @@ import (
 type JSONTime time.Time
 
 type BuildKey struct {
-	Champion         string `json:"champion"`
-	GameVersionMajor int    `json:"gameVersionMajor"`
-	GameVersionMinor int    `json:"gameVersionMinor"`
+	Champion    string `json:"champion"`
+	GameVersion string `json:"gameVersion"`
 }
 
 type Build struct {
-	Champion         string   `json:"champion"`
-	Runes            Runes    `json:"runes"`
-	Items            Items    `json:"items"`
-	GameVersionMajor int      `json:"gameVersionMajor"`
-	GameVersionMinor int      `json:"gameVersionMinor"`
-	Comment          string   `json:"comment"`
-	Mtime            JSONTime `json:"mtime"`
+	Champion    string   `json:"champion"`
+	Runes       Runes    `json:"runes"`
+	Items       Items    `json:"items"`
+	GameVersion string   `json:"gameVersion"`
+	Comment     string   `json:"comment"`
+	Mtime       JSONTime `json:"mtime"`
 }
 
 type Runes struct {
@@ -87,34 +85,31 @@ func (items Items) MarshalJSON() ([]byte, error) {
 
 func (build *Build) UnmarshalJSON(data []byte) (err error) {
 	required := struct {
-		Champion         *string `json:"champion"`
-		Runes            *Runes  `json:"runes"`
-		Items            *Items  `json:"items"`
-		GameVersionMajor *int    `json:"gameVersionMajor"`
-		GameVersionMinor *int    `json:"gameVersionMinor"`
+		Champion    *string `json:"champion"`
+		Runes       *Runes  `json:"runes"`
+		Items       *Items  `json:"items"`
+		GameVersion *string `json:"gameVersion"`
 	}{}
 	all := struct {
-		Champion         string   `json:"champion"`
-		Runes            Runes    `json:"runes"`
-		Items            Items    `json:"items"`
-		GameVersionMajor int      `json:"gameVersionMajor"`
-		GameVersionMinor int      `json:"gameVersionMinor"`
-		Comment          string   `json:"comment"`
-		Mtime            JSONTime `json:"mtime"`
+		Champion    string   `json:"champion"`
+		Runes       Runes    `json:"runes"`
+		Items       Items    `json:"items"`
+		GameVersion string   `json:"gameVersion"`
+		Comment     string   `json:"comment"`
+		Mtime       JSONTime `json:"mtime"`
 	}{}
 
 	err = json.Unmarshal(data, &required)
 	if err != nil {
 		return
-	} else if required.Champion == nil || required.Runes == nil || required.Items == nil || required.GameVersionMajor == nil || required.GameVersionMinor == nil {
+	} else if required.Champion == nil || required.Runes == nil || required.Items == nil || required.GameVersion == nil || *required.GameVersion == "" {
 		err = fmt.Errorf("required field for Build missing")
 	} else {
 		err = json.Unmarshal(data, &all)
 		build.Champion = all.Champion
 		build.Runes = all.Runes
 		build.Items = all.Items
-		build.GameVersionMajor = all.GameVersionMajor
-		build.GameVersionMinor = all.GameVersionMinor
+		build.GameVersion = all.GameVersion
 		build.Comment = all.Comment
 		build.Mtime = all.Mtime
 	}

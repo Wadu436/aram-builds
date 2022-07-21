@@ -1,7 +1,6 @@
 export interface BuildMeta {
   champion: string;
-  gameVersionMajor: number;
-  gameVersionMinor: number;
+  gameVersion: GameVersion;
 }
 
 export interface BuildRunes {
@@ -29,8 +28,7 @@ export interface BuildItems {
 
 export interface Build {
   champion: string;
-  gameVersionMajor: number;
-  gameVersionMinor: number;
+  gameVersion: GameVersion;
   runes: BuildRunes;
   items: BuildItems;
   comment: string;
@@ -44,10 +42,7 @@ export interface BuildEdit {
   comment: string;
 }
 
-export interface GameVersion {
-  major: number;
-  minor: number;
-}
+export type GameVersion = `${number}.${number}`;
 
 export interface Champion {
   id: string;

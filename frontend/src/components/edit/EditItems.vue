@@ -184,7 +184,6 @@
 
 <script setup lang="ts">
 import { useDataDragonStore } from "@/stores/DataDragonStore";
-import { versionToKey } from "@/util";
 import type { GameVersion, BuildItems } from "@/types";
 import { canonicalizeString } from "@/util";
 import { computed, ref, watch } from "vue";
@@ -201,7 +200,7 @@ const props = defineProps<{
 const emit = defineEmits(["update:modelValue"]);
 
 function loadItems(version: GameVersion) {
-  if (!dataDragonStore.items.has(versionToKey(version))) {
+  if (!dataDragonStore.items.has(version)) {
     dataDragonStore.loadItems(version);
   }
 }
@@ -213,7 +212,7 @@ watch(props, (props) => {
 });
 
 const itemsStore = computed(() => {
-  return dataDragonStore.items.get(versionToKey(props.version));
+  return dataDragonStore.items.get(props.version);
 });
 
 const items = computed(() => {

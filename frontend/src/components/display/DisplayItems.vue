@@ -38,7 +38,6 @@
 
 <script setup lang="ts">
 import { useDataDragonStore } from "@/stores/DataDragonStore";
-import { versionToKey } from "@/util";
 import type { Build } from "@/types";
 import { computed, watch } from "vue";
 import ItemPortrait from "../portraits/ItemPortrait.vue";
@@ -48,22 +47,18 @@ const dataDragonStore = useDataDragonStore();
 const props = defineProps<{ build: Build }>();
 
 const version = computed(() => {
-  const v = {
-    major: props.build.gameVersionMajor,
-    minor: props.build.gameVersionMinor,
-  };
-  return v;
+  return props.build.gameVersion;
 });
 
 // Check if itemData needs to be loaded
 watch(version, (version) => {
-  if (!dataDragonStore.items.has(versionToKey(version))) {
+  if (!dataDragonStore.items.has(version)) {
     dataDragonStore.loadItems(version);
   }
 });
 
 const itemsStore = computed(() => {
-  return dataDragonStore.items.get(versionToKey(version.value));
+  return dataDragonStore.items.get(version.value);
 });
 </script>
 

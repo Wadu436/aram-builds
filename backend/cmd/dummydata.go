@@ -26,10 +26,9 @@ var data []db.Build = []db.Build{
 			Start:     []string{"1037", "1006", "1006", "2003"},
 			FullBuild: []string{"6630", "3111", "6333", "3065", "3156", "3053"},
 		},
-		GameVersionMajor: 12,
-		GameVersionMinor: 7,
-		Comment:          "Build for version 12.7",
-		Mtime:            db.JSONTime(time.Now()),
+		GameVersion: "12_7",
+		Comment:     "Build for version 12.7",
+		Mtime:       db.JSONTime(time.Now()),
 	},
 	{
 		Champion: "Aatrox",
@@ -44,10 +43,9 @@ var data []db.Build = []db.Build{
 			Start:     []string{"1001", "6029"},
 			FullBuild: []string{"6630", "3111", "3072", "3065", "3156", "3053"},
 		},
-		GameVersionMajor: 12,
-		GameVersionMinor: 8,
-		Comment:          "Build for version 12.8\n\nChangelog:\nChanged Last Stand to Cut Down.",
-		Mtime:            db.JSONTime(time.Now()),
+		GameVersion: "12_8",
+		Comment:     "Build for version 12.8\n\nChangelog:\nChanged Last Stand to Cut Down.",
+		Mtime:       db.JSONTime(time.Now()),
 	},
 	{
 		Champion: "Aatrox",
@@ -64,10 +62,9 @@ var data []db.Build = []db.Build{
 			FullBuild:        []string{"6630", "3111", "6333", "3065", "3156", "3053"},
 			FullBuildComment: "Some more text",
 		},
-		GameVersionMajor: 12,
-		GameVersionMinor: 13,
-		Comment:          "Build for version 12.13\n\nChangelog:\nNothing changed :).",
-		Mtime:            db.JSONTime(time.Now()),
+		GameVersion: "12_13",
+		Comment:     "Build for version 12.13\n\nChangelog:\nNothing changed :).",
+		Mtime:       db.JSONTime(time.Now()),
 	},
 }
 
@@ -77,7 +74,7 @@ var dummydataCommand = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		serverConfig.Auth.UpdateUser(user, password)
 		for _, build := range data {
-			// db.DeleteBuild(build.Champion, build.GameVersionMajor, build.GameVersionMinor)
+			// db.DeleteBuild(build.Champion, build.GameVersion)
 			db.StoreBuild(build)
 		}
 		log.Println("Added dummy data")

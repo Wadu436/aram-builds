@@ -199,7 +199,6 @@
 
 <script setup lang="ts">
 import { useDataDragonStore } from "@/stores/DataDragonStore";
-import { versionToKey } from "@/util";
 import type { GameVersion, BuildRunesEdit } from "@/types";
 import { computed, ref, watch, type Ref } from "vue";
 
@@ -213,7 +212,7 @@ const emit = defineEmits(["update:modelValue"]);
 // Take a copy of runes
 
 function loadRunes(version: GameVersion) {
-  if (!dataDragonStore.runes.has(versionToKey(version))) {
+  if (!dataDragonStore.runes.has(version)) {
     dataDragonStore.loadRunes(version);
   }
 }
@@ -224,9 +223,7 @@ watch(props, (props) => {
   loadRunes(props.version);
 });
 
-const runeData = computed(() =>
-  dataDragonStore.runes.get(versionToKey(props.version))
-);
+const runeData = computed(() => dataDragonStore.runes.get(props.version));
 
 const lastSelectedSecondarySlot: Ref<number | null> = ref(null);
 
