@@ -13,6 +13,7 @@
             <div
               v-for="tree in runeDataArray"
               @click="() => changePrimaryTree(tree.key)"
+              :key="tree.key"
             >
               <div
                 class="cursor-pointer hover:scale-110"
@@ -36,6 +37,7 @@
               <div
                 v-for="(slot, i) in runeDataPrimary.slots[0]"
                 @click="() => changePrimaryTreeRune(0, i)"
+                :key="i"
               >
                 <div
                   class="cursor-pointer hover:scale-110"
@@ -57,11 +59,13 @@
             <div
               class="flex justify-evenly mt-4"
               v-for="(row, j) in runeDataPrimary.slots.slice(1)"
+              :key="j"
             >
               <!-- Slots -->
               <div
                 v-for="(slot, i) in row"
                 @click="() => changePrimaryTreeRune(j + 1, i)"
+                :key="i"
               >
                 <div
                   class="border-2 rounded-full border-transparent cursor-pointer hover:scale-110"
@@ -99,6 +103,7 @@
                 (tree) => tree.key != runeDataPrimary?.key
               )"
               @click="() => changeSecondaryTree(tree.key)"
+              :key="tree.key"
             >
               <div
                 class="cursor-pointer hover:scale-110"
@@ -121,11 +126,13 @@
               <div
                 class="flex justify-evenly mb-4"
                 v-for="(row, j) in runeDataSecondary.slots.slice(1)"
+                :key="j"
               >
                 <!-- Slots -->
                 <div
                   v-for="(slot, i) in row"
                   @click="() => changeSecondaryTreeRune(j, i)"
+                  :key="i"
                 >
                   <div
                     class="border-2 rounded-full border-transparent cursor-pointer hover:scale-110"
@@ -158,9 +165,14 @@
           <div
             class="flex justify-evenly mb-4"
             v-for="(row, j) in dataDragonStore.statRunes.slots"
+            :key="j"
           >
             <!-- Slots -->
-            <div v-for="(slot, i) in row" @click="() => changeStatsRune(j, i)">
+            <div
+              v-for="(slot, i) in row"
+              @click="() => changeStatsRune(j, i)"
+              :key="i"
+            >
               <div
                 class="border-2 rounded-full border-transparent cursor-pointer hover:scale-110"
                 :class="{
@@ -186,15 +198,9 @@
 </template>
 
 <script setup lang="ts">
-import {
-  useDataDragonStore,
-  versionToKey,
-  type GameVersion,
-  type RuneStats,
-  type RuneTree,
-} from "@/stores/DataDragonStore";
-import type { BuildRunesEdit } from "@/views/BuildView.vue";
-import { computed, ref, toRef, watch, type Ref } from "vue";
+import { useDataDragonStore } from "@/stores/DataDragonStore";
+import type { GameVersion, BuildRunesEdit } from "@/types";
+import { computed, ref, watch, type Ref } from "vue";
 
 const dataDragonStore = useDataDragonStore();
 
@@ -203,13 +209,8 @@ const props = defineProps<{
   version: GameVersion;
 }>();
 const emit = defineEmits(["update:modelValue"]);
-// Take a copy of runes
 
-function loadRunes(version: GameVersion) {
-  if (!dataDragonStore.runes.has(versionToKey(version))) {
-    dataDragonStore.loadRunes(version);
-  }
-}
+const lastSelectedSecondarySlot: Ref<number | null> = ref(null);
 
 // Check if runeData needs to be loaded
 loadRunes(props.version);
@@ -217,12 +218,8 @@ watch(props, (props) => {
   loadRunes(props.version);
 });
 
-const runeData = computed(() =>
-  dataDragonStore.runes.get(versionToKey(props.version))
-);
-
-const lastSelectedSecondarySlot: Ref<number | null> = ref(null);
-
+// Take a copy of runes
+const runeData = computed(() => dataDragonStore.runes.get(props.version));
 const runeDataArray = computed(() => {
   if (runeData.value) {
     return [...runeData.value.values()];
@@ -230,29 +227,42 @@ const runeDataArray = computed(() => {
     return [];
   }
 });
-
-console.log(props.modelValue);
-
 const runeDataPrimary = computed(() => {
   if (props.modelValue.primaryKey) {
     return runeData.value?.get(props.modelValue.primaryKey);
   } else {
-    undefined;
+    return undefined;
   }
 });
 const runeDataSecondary = computed(() => {
   if (props.modelValue.secondaryKey) {
     return runeData.value?.get(props.modelValue.secondaryKey);
   } else {
-    undefined;
+    return undefined;
   }
 });
+const secondaryNumSelected = computed(
+  () =>
+    props.modelValue.secondarySelections.reduce((val, slot) => {
+      if (slot !== null) {
+        return (val || 0) + 1;
+      } else {
+        return val;
+      }
+    }, 0) || 0
+);
+
+function loadRunes(version: GameVersion) {
+  if (!dataDragonStore.runes.has(version)) {
+    dataDragonStore.loadRunes(version);
+  }
+}
 
 function changePrimaryTree(treeKey: string) {
   if (treeKey == runeDataPrimary.value?.key) {
     return;
   }
-  let runesCopy = { ...props.modelValue };
+  const runesCopy = { ...props.modelValue };
   runesCopy.primaryKey = treeKey;
   runesCopy.primarySelections = [null, null, null, null];
   if (runesCopy.secondaryKey === treeKey) {
@@ -265,31 +275,20 @@ function changeSecondaryTree(treeKey: string) {
   if (treeKey == runeDataSecondary.value?.key) {
     return;
   }
-  let runesCopy = { ...props.modelValue };
+  const runesCopy = { ...props.modelValue };
   runesCopy.secondaryKey = treeKey;
   runesCopy.secondarySelections = [null, null, null];
   emit("update:modelValue", runesCopy);
 }
 
 function changePrimaryTreeRune(row: number, slot: number) {
-  let runesCopy = { ...props.modelValue };
+  const runesCopy = { ...props.modelValue };
   runesCopy.primarySelections[row] = slot;
   emit("update:modelValue", runesCopy);
 }
 
-const secondaryNumSelected = computed(
-  () =>
-    props.modelValue.secondarySelections.reduce((val, slot) => {
-      if (slot !== null) {
-        return (val || 0) + 1;
-      } else {
-        return val;
-      }
-    }, 0) || 0
-);
-
 function changeSecondaryTreeRune(row: number, slot: number) {
-  let runesCopy = { ...props.modelValue };
+  const runesCopy = { ...props.modelValue };
 
   const unselect =
     runesCopy.secondarySelections[row] === null ||
@@ -297,15 +296,11 @@ function changeSecondaryTreeRune(row: number, slot: number) {
 
   runesCopy.secondarySelections[row] = slot;
 
-  console.log("unselect", unselect);
-
   if (unselect) {
     // Find which one to unselect
     const unselectOption = [2, 1, 0]
       .filter((val) => val !== row)
       .filter((val) => val !== lastSelectedSecondarySlot.value)[0];
-
-    console.log("unselectOption", unselectOption);
 
     // unselect it
     runesCopy.secondarySelections[unselectOption] = null;
@@ -317,13 +312,9 @@ function changeSecondaryTreeRune(row: number, slot: number) {
 }
 
 function changeStatsRune(row: number, slot: number) {
-  let runesCopy = { ...props.modelValue };
+  const runesCopy = { ...props.modelValue };
   runesCopy.stats[row] = slot;
   emit("update:modelValue", runesCopy);
-}
-
-function updateRunes() {
-  emit("update:modelValue", props.modelValue);
 }
 </script>
 

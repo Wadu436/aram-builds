@@ -9,10 +9,7 @@ module.exports = {
     "@vue/eslint-config-typescript/recommended",
     "@vue/eslint-config-prettier",
   ],
-  "prettier/prettier": [
-    "error",
-    {
-      endOfLine: "auto",
-    },
-  ],
+  rules: {
+    "prettier/prettier": ["error", { endOfLine: "auto" }],
+  },
 };

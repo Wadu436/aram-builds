@@ -32,8 +32,8 @@ func StoreUser(user auth.User) {
 }
 
 // Load and Store Build
-func LoadBuild(champion string, gameVersionMajor int, gameVersionMinor int) (Build, bool) {
-	row := dbpool.QueryRow(context.Background(), "SELECT * FROM builds WHERE champion = $1 AND game_version_major = $2 AND game_version_minor = $3;", champion, gameVersionMajor, gameVersionMinor)
+func LoadBuild(champion string, gameVersion string) (Build, bool) {
+	row := dbpool.QueryRow(context.Background(), "SELECT * FROM builds WHERE champion = $1 AND game_version = $2;", champion, gameVersion)
 
 	build, err := BuildReadRow(row)
 	if err != nil {
@@ -46,10 +46,10 @@ func LoadBuild(champion string, gameVersionMajor int, gameVersionMinor int) (Bui
 func StoreBuild(build Build) {
 	fmt.Println(build.Runes.Stats)
 	_, err := dbpool.Exec(context.Background(),
-		`INSERT INTO builds (champion, game_version_major, game_version_minor, mtime, 
+		`INSERT INTO builds (champion, game_version, mtime, 
 			runesPrimaryKey, runesPrimarySelections, runesSecondaryKey, runesSecondarySelections, runesStats, 
 			itemsStart, itemsFullBuild, comment, itemsStartComment, itemsFullBuildComment) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) ON CONFLICT (champion, game_version_major, game_version_minor) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) ON CONFLICT (champion, game_version) 
 		DO UPDATE SET 
 			mtime = EXCLUDED.mtime, 
 			runesPrimaryKey = EXCLUDED.runesPrimaryKey,
@@ -62,7 +62,7 @@ func StoreBuild(build Build) {
 			comment = EXCLUDED.comment,
 			itemsStartComment = EXCLUDED.itemsStartComment,
 			itemsFullBuildComment = EXCLUDED.itemsFullBuildComment;`,
-		build.Champion, build.GameVersionMajor, build.GameVersionMinor, build.Mtime,
+		build.Champion, build.GameVersion, build.Mtime,
 		build.Runes.PrimaryKey, build.Runes.PrimarySelections,
 		build.Runes.SecondaryKey, build.Runes.SecondarySelections, build.Runes.Stats,
 		build.Items.Start, build.Items.FullBuild, build.Comment, build.Items.StartComment, build.Items.FullBuildComment)
@@ -71,14 +71,14 @@ func StoreBuild(build Build) {
 	}
 }
 
-func DeleteBuild(champion string, gameVersionMajor int, gameVersionMinor int) error {
+func DeleteBuild(champion string, gameVersion string) error {
 	_, err := dbpool.Exec(context.Background(),
-		`DELETE FROM builds WHERE champion = $1 AND game_version_major = $2 AND game_version_minor = $3;`, champion, gameVersionMajor, gameVersionMinor)
+		`DELETE FROM builds WHERE champion = $1 AND game_version = $2;`, champion, gameVersion)
 	return err
 }
 
 func AllBuilds() ([]BuildKey, error) {
-	rows, err := dbpool.Query(context.Background(), "SELECT champion, game_version_major, game_version_minor FROM builds;")
+	rows, err := dbpool.Query(context.Background(), "SELECT champion, game_version FROM builds;")
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func AllBuilds() ([]BuildKey, error) {
 
 	for rows.Next() {
 		var buildkey BuildKey
-		err := rows.Scan(&buildkey.Champion, &buildkey.GameVersionMajor, &buildkey.GameVersionMinor)
+		err := rows.Scan(&buildkey.Champion, &buildkey.GameVersion)
 		if err != nil {
 			return nil, err
 		}
@@ -96,7 +96,7 @@ func AllBuilds() ([]BuildKey, error) {
 }
 
 func AllBuildsChampion(champion string) ([]BuildKey, error) {
-	rows, err := dbpool.Query(context.Background(), "SELECT champion, game_version_major, game_version_minor FROM builds WHERE champion = $1;", champion)
+	rows, err := dbpool.Query(context.Background(), "SELECT champion, game_version FROM builds WHERE champion = $1;", champion)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +104,7 @@ func AllBuildsChampion(champion string) ([]BuildKey, error) {
 
 	for rows.Next() {
 		var buildkey BuildKey
-		err := rows.Scan(&buildkey.Champion, &buildkey.GameVersionMajor, &buildkey.GameVersionMinor)
+		err := rows.Scan(&buildkey.Champion, &buildkey.GameVersion)
 		if err != nil {
 			return nil, err
 		}
@@ -113,22 +113,13 @@ func AllBuildsChampion(champion string) ([]BuildKey, error) {
 	return buildkeys, nil
 }
 
-func LatestBuild(champion string) (Build, bool) {
-	row := dbpool.QueryRow(context.Background(), "SELECT * FROM builds WHERE champion = $1 ORDER BY game_version_major, game_version_minor DESC LIMIT 1;", champion)
-	build, err := BuildReadRow(row)
-	if err != nil {
-		return Build{}, false
-	}
-	return build, true
-}
-
 func BuildReadRow(row pgx.Row) (Build, error) {
 	var build Build
 	var primarySelections *[4]int = nil
 	var secondarySelections *[3]int = nil
 	var stats *[3]int = nil
 
-	if err := row.Scan(&build.Champion, &build.GameVersionMajor, &build.GameVersionMinor, (*time.Time)(&build.Mtime), &build.Runes.PrimaryKey, &primarySelections, &build.Runes.SecondaryKey, &secondarySelections, &stats, &build.Items.Start, &build.Items.FullBuild, &build.Comment, &build.Items.StartComment, &build.Items.FullBuildComment); err != nil {
+	if err := row.Scan(&build.Champion, (*time.Time)(&build.Mtime), &build.Runes.PrimaryKey, &primarySelections, &build.Runes.SecondaryKey, &secondarySelections, &stats, &build.Items.Start, &build.Items.FullBuild, &build.Comment, &build.Items.StartComment, &build.Items.FullBuildComment, &build.GameVersion); err != nil {
 		return Build{}, err
 	}
 

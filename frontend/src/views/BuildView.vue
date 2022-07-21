@@ -26,8 +26,12 @@
                 id="versions"
                 v-model="currentVersion"
               >
-                <option v-for="build in builds" :value="build">
-                  {{ build.major }}.{{ build.minor }}
+                <option
+                  v-for="version in builds"
+                  :value="version"
+                  :key="version"
+                >
+                  {{ version }}
                 </option>
               </select>
             </div>
@@ -55,159 +59,51 @@
 <script setup lang="ts">
 import { useDataDragonStore } from "@/stores/DataDragonStore";
 import { computed, ref, watch, type Ref } from "vue";
-import type { GameVersion } from "@/stores/DataDragonStore";
-import { useStateStore } from "@/stores/state";
+import type { Build, GameVersion } from "@/types";
 import DisplayRunes from "../components/display/DisplayRunes.vue";
 import DisplayItems from "../components/display/DisplayItems.vue";
 import IconBack from "../components/icons/IconBack.vue";
+import { getBuild, getBuilds } from "@/api";
+import { versionSortKey } from "@/util";
 
-export interface BuildMeta {
-  champion: string;
-  gameVersionMajor: number;
-  gameVersionMinor: number;
-}
-
-export interface BuildRunes {
-  primaryKey: string;
-  primarySelections: number[];
-  secondaryKey: string;
-  secondarySelections: number[];
-  stats: number[];
-}
-
-export interface BuildRunesEdit {
-  primaryKey: string | null;
-  primarySelections: (number | null)[];
-  secondaryKey: string | null;
-  secondarySelections: (number | null)[];
-  stats: (number | null)[];
-}
-
-export interface BuildItems {
-  start: string[];
-  startComment: string;
-  fullbuild: string[];
-  fullbuildComment: string;
-}
-
-export interface Build {
-  champion: string;
-  gameVersionMajor: number;
-  gameVersionMinor: number;
-  runes: BuildRunes;
-  items: BuildItems;
-  comment: string;
-}
-
-export interface BuildEdit {
-  champion: string;
-  version: GameVersion;
-  runes: BuildRunesEdit;
-  items: BuildItems;
-  comment: string;
-}
+const dataDragonStore = useDataDragonStore();
 
 const props = defineProps({
   champion: String,
-});
-
-const championId = computed(() => props.champion || "");
-
-const dataDragonStore = useDataDragonStore();
-const stateStore = useStateStore();
-
-const champion = computed(() => {
-  console.log("championKey:", championId);
-  return dataDragonStore.champions.get(championId.value);
 });
 
 const builds: Ref<GameVersion[]> = ref([]);
 const currentVersion: Ref<GameVersion | null> = ref(null);
 const currentBuild: Ref<Build | null> = ref(null);
 
-async function setupBuilds() {
-  stateStore.loading = true;
-  const url = `/api/build/${championId.value}`;
-  fetch(url)
-    .then((response) => response.json())
-    .then((data: BuildMeta[]) => {
-      builds.value = data.map((meta) => ({
-        major: meta.gameVersionMajor,
-        minor: meta.gameVersionMinor,
-      }));
-      builds.value
-        .sort((a, b) => {
-          if (a.major == b.major) {
-            if (a.minor == b.minor) {
-              // a == b
-              return 0;
-            } else if (a.minor > b.minor) {
-              // a > b
-              return 1;
-            } else {
-              // a < b
-              return -1;
-            }
-          } else if (a.major > b.major) {
-            // a > b
-            return 1;
-          } else {
-            // a < b
-            return -1;
-          }
-        })
-        .reverse();
-    });
+const championId = computed(() => props.champion || "");
+const champion = computed(() => {
+  return dataDragonStore.champions.get(championId.value);
+});
 
-  const urlLatest = `/api/build/${championId.value}/latest`;
-  (async () => {
-    let response = await fetch(urlLatest);
-    if (!response.ok) {
-      stateStore.loading = false;
-      return;
-    }
-    let data: Build = await response.json();
-    currentBuild.value = data;
-    currentVersion.value = {
-      major: data.gameVersionMajor,
-      minor: data.gameVersionMinor,
-    };
-    stateStore.loading = false;
-  })();
-}
-
-async function fetchBuild(version: GameVersion | null) {
-  //   let url = `/api/build/${championId.value}/latest`;
-  let url;
-  if (version) {
-    url = `/api/build/${championId.value}/${version.major}/${version.minor}`;
-  } else {
-    url = `/api/build/${championId.value}/latest`;
-  }
-
-  fetch(url)
-    .then((response) => response.json())
-    .then((data: Build) => {
-      currentBuild.value = data;
-      currentVersion.value = {
-        major: data.gameVersionMajor,
-        minor: data.gameVersionMinor,
-      };
-    });
-}
-
+setupBuilds();
 watch(currentVersion, (newVersion, oldVersion) => {
-  if (
-    oldVersion?.major !== newVersion?.major ||
-    oldVersion?.minor !== newVersion?.minor
-  ) {
+  if (oldVersion !== newVersion) {
     if (newVersion) {
-      fetchBuild(newVersion);
+      loadBuild(newVersion);
     }
   }
 });
 
-setupBuilds();
+async function setupBuilds() {
+  const buildsTemp = (await getBuilds(championId.value)).map(
+    (meta) => meta.gameVersion
+  );
+  buildsTemp.sort(versionSortKey).reverse();
+  builds.value = buildsTemp;
 
-// const builds = reactive({});
+  loadBuild(buildsTemp[0]);
+}
+
+async function loadBuild(version: GameVersion) {
+  const build = await getBuild(championId.value, version);
+
+  currentBuild.value = build;
+  currentVersion.value = build.gameVersion;
+}
 </script>

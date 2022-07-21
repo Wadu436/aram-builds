@@ -57,7 +57,7 @@
             </button>
           </div>
           <draggable
-            v-model="modelValue.start"
+            v-model="startItems"
             :group="{ name: 'itemsBox', pull: true, put: true }"
             class="mr-2 flex min-h-[2rem] bg-stone-700 rounded-md p-2 gap-2 flex-wrap"
             @dragstart="dragging = true"
@@ -122,7 +122,7 @@
             </button>
           </div>
           <draggable
-            v-model="modelValue.fullbuild"
+            v-model="fullbuildItems"
             :group="{ name: 'itemsBox', pull: true, put: true }"
             class="mr-2 flex min-h-[2rem] bg-stone-700 rounded-md p-2 gap-2 flex-wrap"
             @dragstart="dragging = true"
@@ -183,14 +183,10 @@
 </template>
 
 <script setup lang="ts">
-import {
-  useDataDragonStore,
-  versionToKey,
-  type GameVersion,
-} from "@/stores/DataDragonStore";
+import { useDataDragonStore } from "@/stores/DataDragonStore";
+import type { GameVersion, BuildItems } from "@/types";
 import { canonicalizeString } from "@/util";
-import type { BuildItems } from "@/views/BuildView.vue";
-import { computed, ref, toRef, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import ItemPortrait from "../portraits/ItemPortrait.vue";
 import draggable from "vuedraggable";
 import IconBin from "../icons/IconBin.vue";
@@ -202,23 +198,17 @@ const props = defineProps<{
   version: GameVersion;
 }>();
 const emit = defineEmits(["update:modelValue"]);
+defineExpose({ cancelEditing });
 
-function loadItems(version: GameVersion) {
-  console.log("version", version);
-  console.log("has version", dataDragonStore.items.has(versionToKey(version)));
-  if (!dataDragonStore.items.has(versionToKey(version))) {
-    dataDragonStore.loadItems(version);
-  }
-}
-
-// Check if runeData needs to be loaded
-loadItems(props.version);
-watch(props, (props) => {
-  loadItems(props.version);
-});
+const search = ref("");
+const dragging = ref(false);
+const editingStartComment = ref(false);
+const editingStartCommentText = ref("");
+const editingFullComment = ref(false);
+const editingFullCommentText = ref("");
 
 const itemsStore = computed(() => {
-  return dataDragonStore.items.get(versionToKey(props.version));
+  return dataDragonStore.items.get(props.version);
 });
 
 const items = computed(() => {
@@ -230,15 +220,6 @@ const items = computed(() => {
   }
 });
 
-const search = ref("");
-
-const dragging = ref(false);
-
-const editingStartComment = ref(false);
-const editingStartCommentText = ref("");
-const editingFullComment = ref(false);
-const editingFullCommentText = ref("");
-
 const filteredItems = computed(() => {
   return items.value.filter((item) => {
     return canonicalizeString(itemsStore.value?.get(item)?.name || "").includes(
@@ -247,21 +228,54 @@ const filteredItems = computed(() => {
   });
 });
 
-const version = toRef(props, "version");
+// Check if runeData needs to be loaded
+loadItems(props.version);
+watch(props, (props) => {
+  loadItems(props.version);
+});
+
+function loadItems(version: GameVersion) {
+  if (!dataDragonStore.items.has(version)) {
+    dataDragonStore.loadItems(version);
+  }
+}
 
 function changeStartComment() {
-  let itemsCopy = { ...props.modelValue };
+  const itemsCopy = { ...props.modelValue };
   itemsCopy.startComment = editingStartCommentText.value;
   emit("update:modelValue", itemsCopy);
   editingStartComment.value = false;
 }
 
 function changeFullBuildComment() {
-  let itemsCopy = { ...props.modelValue };
+  const itemsCopy = { ...props.modelValue };
   itemsCopy.fullbuildComment = editingFullCommentText.value;
   emit("update:modelValue", itemsCopy);
   editingFullComment.value = false;
 }
+
+const startItems = computed({
+  get: () => {
+    return props.modelValue.start;
+  },
+  set: (newStart) => {
+    const itemsCopy = { ...props.modelValue };
+    itemsCopy.start = newStart;
+    emit("update:modelValue", itemsCopy);
+    editingStartComment.value = false;
+  },
+});
+const fullbuildItems = computed({
+  get: () => {
+    return props.modelValue.fullbuild;
+  },
+  set: (newFullbuild) => {
+    const itemsCopy = { ...props.modelValue };
+    itemsCopy.fullbuild = newFullbuild;
+    emit("update:modelValue", itemsCopy);
+    editingStartComment.value = false;
+  },
+});
 
 function cancelEditing() {
   editingStartComment.value = false;
@@ -269,20 +283,18 @@ function cancelEditing() {
 }
 
 function emptyStart() {
-  let itemsCopy = { ...props.modelValue };
+  const itemsCopy = { ...props.modelValue };
   itemsCopy.start = [];
   emit("update:modelValue", itemsCopy);
   editingStartComment.value = false;
 }
 
 function emptyFullBuild() {
-  let itemsCopy = { ...props.modelValue };
+  const itemsCopy = { ...props.modelValue };
   itemsCopy.fullbuild = [];
   emit("update:modelValue", itemsCopy);
   editingStartComment.value = false;
 }
-
-defineExpose({ cancelEditing });
 </script>
 
 <style scoped></style>

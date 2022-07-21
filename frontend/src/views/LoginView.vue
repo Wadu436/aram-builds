@@ -42,6 +42,7 @@
 </template>
 
 <script setup lang="ts">
+import { verifyHeaders } from "@/api";
 import { useStateStore } from "@/stores/state";
 import { createAuthHeaders } from "@/util";
 import { ref } from "vue";
@@ -49,15 +50,12 @@ import { useRouter, useRoute } from "vue-router";
 
 const stateStore = useStateStore();
 
-const username = ref("");
-const password = ref("");
-
 const router = useRouter();
 const route = useRoute();
 
+const username = ref("");
+const password = ref("");
 const message = ref("");
-
-console.log(route.query.redirect);
 
 const onLogin = async () => {
   message.value = "";
@@ -74,16 +72,9 @@ const onLogin = async () => {
     return;
   }
 
-  const response = await fetch("/api/auth/check/", {
-    method: "POST",
-    headers: createAuthHeaders(username.value, password.value),
-  });
-  if (!response.ok) {
-    if (response.status == 401) {
-      message.value = "Invalid username or password";
-    } else {
-      message.value = `${response.status}: ${response.statusText}`;
-    }
+  const headers = createAuthHeaders(username.value, password.value);
+  if (!(await verifyHeaders(headers))) {
+    message.value = `Invalid username or password`;
     return;
   }
 
@@ -101,8 +92,6 @@ const onLogin = async () => {
       redirect = route.query.redirect.toString();
     }
   }
-
-  console.log("redirecting to", redirect);
 
   router.push(redirect);
 };

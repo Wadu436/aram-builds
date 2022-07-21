@@ -3,7 +3,6 @@ import ChampionView from "../views/ChampionView.vue";
 import BuildView from "@/views/BuildView.vue";
 import LoginView from "@/views/LoginView.vue";
 import AdminView from "@/views/AdminView.vue";
-import { useStateStore } from "@/stores/state";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

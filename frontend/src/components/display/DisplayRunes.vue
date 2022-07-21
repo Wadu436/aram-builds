@@ -17,7 +17,7 @@
           <!-- Keystone -->
           <div class="flex justify-evenly mb-4">
             <!-- Slots -->
-            <div v-for="(slot, i) in runeDataPrimary.slots[0]">
+            <div v-for="(slot, i) in runeDataPrimary.slots[0]" :key="i">
               <div
                 :class="{
                   'grayscale opacity-40':
@@ -32,9 +32,10 @@
           <div
             class="flex justify-evenly mt-4"
             v-for="(row, j) in runeDataPrimary.slots.slice(1)"
+            :key="j"
           >
             <!-- Slots -->
-            <div v-for="(slot, i) in row">
+            <div v-for="(slot, i) in row" :key="i">
               <div
                 class="border-2 rounded-full border-transparent"
                 :class="{
@@ -66,9 +67,10 @@
           <div
             class="flex justify-evenly mb-4"
             v-for="(row, j) in runeDataSecondary.slots.slice(1)"
+            :key="j"
           >
             <!-- Slots -->
-            <div v-for="(slot, i) in row">
+            <div v-for="(slot, i) in row" :key="i">
               <div
                 class="border-2 rounded-full border-transparent"
                 :class="{
@@ -90,9 +92,10 @@
           <div
             class="flex justify-evenly mb-4"
             v-for="(row, j) in dataDragonStore.statRunes.slots"
+            :key="j"
           >
             <!-- Slots -->
-            <div v-for="(slot, i) in row">
+            <div v-for="(slot, i) in row" :key="i">
               <div
                 :class="{
                   'grayscale opacity-40': props.build.runes.stats[j] !== i,
@@ -111,35 +114,18 @@
 </template>
 
 <script setup lang="ts">
-import { useDataDragonStore, versionToKey } from "@/stores/DataDragonStore";
-import type { Build } from "@/views/BuildView.vue";
-import { computed, reactive, toRef, watch } from "vue";
+import { useDataDragonStore } from "@/stores/DataDragonStore";
+import type { Build } from "@/types";
+import { computed, watch } from "vue";
 
 const dataDragonStore = useDataDragonStore();
 
 const props = defineProps<{ build: Build }>();
 
 const version = computed(() => {
-  const v = {
-    major: props.build.gameVersionMajor,
-    minor: props.build.gameVersionMinor,
-  };
-  console.log("v", v);
-  return v;
+  return props.build.gameVersion;
 });
-
-// Check if runeData needs to be loaded
-watch(version, (version) => {
-  console.log("version", version);
-  console.log("has version", dataDragonStore.runes.has(versionToKey(version)));
-  if (!dataDragonStore.runes.has(versionToKey(version))) {
-    dataDragonStore.loadRunes(version);
-  }
-});
-
-const runeData = computed(() =>
-  dataDragonStore.runes.get(versionToKey(version.value))
-);
+const runeData = computed(() => dataDragonStore.runes.get(version.value));
 const runeDataPrimary = computed(() =>
   runeData.value?.get(props.build.runes.primaryKey)
 );
@@ -147,7 +133,12 @@ const runeDataSecondary = computed(() =>
   runeData.value?.get(props.build.runes.secondaryKey)
 );
 
-console.log("build", props.build);
+// Check if runeData needs to be loaded
+watch(version, (version) => {
+  if (!dataDragonStore.runes.has(version)) {
+    dataDragonStore.loadRunes(version);
+  }
+});
 </script>
 
 <style scoped></style>

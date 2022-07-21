@@ -1,34 +1,3 @@
-<script setup lang="ts">
-import { computed, ref } from "vue";
-import { useDataDragonStore } from "../stores/DataDragonStore";
-
-import { RouterLink } from "vue-router";
-import ChampionPortrait from "../components/portraits/ChampionPortrait.vue";
-
-import { canonicalizeString } from "../util";
-import IconSearch from "../components/icons/IconSearch.vue";
-import type { BuildMeta } from "./BuildView.vue";
-
-const searchString = ref("");
-const dataDragonStore = useDataDragonStore();
-const filteredChampions = computed(() => {
-  let champions = [...dataDragonStore.champions.values()];
-
-  return champions.filter((c) =>
-    canonicalizeString(c.name).includes(canonicalizeString(searchString.value))
-  );
-});
-
-const champBuilds = ref<Map<string, BuildMeta>>(new Map());
-(async () => {
-  const response = await fetch("/api/build/");
-  const data: BuildMeta[] = await response.json();
-  data.forEach((meta) => {
-    champBuilds.value.set(meta.champion, meta);
-  });
-})();
-</script>
-
 <template>
   <div class="flex flex-auto w-full items-center flex-col overflow-hidden">
     <!-- Search -->
@@ -82,3 +51,36 @@ const champBuilds = ref<Map<string, BuildMeta>>(new Map());
     </div> -->
   </div>
 </template>
+
+<script setup lang="ts">
+import { computed, ref } from "vue";
+import { useDataDragonStore } from "../stores/DataDragonStore";
+
+import { RouterLink } from "vue-router";
+import ChampionPortrait from "../components/portraits/ChampionPortrait.vue";
+
+import { canonicalizeString } from "../util";
+import IconSearch from "../components/icons/IconSearch.vue";
+import type { BuildMeta } from "@/types";
+
+import { getAllBuilds } from "@/api";
+
+const dataDragonStore = useDataDragonStore();
+
+const searchString = ref("");
+const champBuilds = ref<Map<string, BuildMeta>>(new Map());
+
+const filteredChampions = computed(() => {
+  const champions = [...dataDragonStore.champions.values()];
+
+  return champions.filter((c) =>
+    canonicalizeString(c.name).includes(canonicalizeString(searchString.value))
+  );
+});
+
+getAllBuilds().then((metas) => {
+  metas.forEach((meta) => {
+    champBuilds.value.set(meta.champion, meta);
+  });
+});
+</script>

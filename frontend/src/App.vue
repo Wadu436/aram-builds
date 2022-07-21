@@ -1,21 +1,16 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from "vue-router";
-import { ref } from "vue";
-import LoadingOverlay from "./components/overlays/LoadingOverlay.vue";
-import { useStateStore } from "./stores/state";
+import { RouterView } from "vue-router";
 
-const open = ref(false);
+// const open = ref(false);
 
-const stateStore = useStateStore();
+// const navItems = [
+//   { to: "/", title: "Champions" },
+//   // { to: "/about", title: "About" },
+// ];
 
-const navItems = [
-  { to: "/", title: "Champions" },
-  // { to: "/about", title: "About" },
-];
-
-function toggle() {
-  open.value = !open.value;
-}
+// function toggle() {
+//   open.value = !open.value;
+// }
 </script>
 
 <template>
@@ -55,7 +50,6 @@ function toggle() {
       </div>
     </nav> -->
     <div class="relative overflow-hidden flex-auto flex">
-      <LoadingOverlay />
       <RouterView />
     </div>
   </div>

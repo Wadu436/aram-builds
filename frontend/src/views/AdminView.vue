@@ -22,6 +22,7 @@
             v-for="champion in filteredChampions"
             class="block w-full"
             @click="() => selectChampion(champion.id)"
+            :key="champion.id"
           >
             <div class="flex items-center p-4 m-2 bg-stone-800 rounded-md">
               <ChampionPortrait :champion="champion" />
@@ -70,8 +71,9 @@
                 class="px-4 py-2 bg-stone-800 rounded-md mt-2 cursor-pointer hover:bg-stone-700 flex items-center justify-center"
                 v-for="build in selectedChampionBuilds"
                 @click="() => selectBuild(build)"
+                :key="build.gameVersion"
               >
-                {{ build.gameVersionMajor }}.{{ build.gameVersionMinor }}
+                {{ build.gameVersion }}
               </div>
             </div>
           </div>
@@ -93,10 +95,11 @@
                 <option
                   :value="version"
                   v-for="version in [
-                    ...dataDragonStore.gameVersions.values(),
+                    ...dataDragonStore.versions.keys(),
                   ].reverse()"
+                  :key="version"
                 >
-                  {{ version.major }}.{{ version.minor }}
+                  {{ version }}
                 </option>
               </select>
             </div>
@@ -125,19 +128,24 @@
 <script setup lang="ts">
 import { useDataDragonStore } from "@/stores/DataDragonStore";
 import { canonicalizeString } from "@/util";
-import { ref, computed, type Ref, watch, reactive } from "vue";
+import { ref, computed, type Ref, watch } from "vue";
 import ChampionPortrait from "../components/portraits/ChampionPortrait.vue";
 
 import IconSearch from "../components/icons/IconSearch.vue";
-import type { Build, BuildEdit, BuildMeta, BuildRunes } from "./BuildView.vue";
+import type { Build, BuildEdit, BuildMeta, BuildRunes } from "@/types";
 import EditRunes from "../components/edit/EditRunes.vue";
 import EditItems from "../components/edit/EditItems.vue";
-import { useStateStore } from "@/stores/state";
 
-const editItems: Ref<{ cancelEditing: Function } | null> = ref(null);
+import { getBuild, getBuilds, postBuild } from "@/api";
 
-const searchString = ref("");
 const dataDragonStore = useDataDragonStore();
+
+const editItems: Ref<{ cancelEditing: () => void } | null> = ref(null);
+const searchString = ref("");
+const selectedChampionId = ref("");
+const editingBuild = ref<BuildEdit>();
+const selectedChampionBuilds: Ref<BuildMeta[]> = ref([]);
+
 const champions = computed(() => {
   return [...dataDragonStore.champions.values()];
 });
@@ -146,28 +154,25 @@ const filteredChampions = computed(() => {
     canonicalizeString(c.name).includes(canonicalizeString(searchString.value))
   );
 });
-
-const selectedChampionId = ref("");
 const selectedChampion = computed(() => {
   return dataDragonStore.champions.get(selectedChampionId.value);
 });
+const validatedBuild = computed(() => {
+  if (editingBuild.value) {
+    const validateddBuild = validateBuild(editingBuild.value);
+    return validateddBuild;
+  } else {
+    return null;
+  }
+});
 
-const editingBuild = ref<BuildEdit>();
-
-const selectedChampionBuilds: Ref<BuildMeta[]> = ref([]);
 watch(selectedChampionId, (championId) => {
   loadBuilds(championId);
   editingBuild.value = undefined;
 });
 
 async function loadBuilds(championId: string) {
-  const response = await fetch(`/api/build/${championId}`);
-  if (!response.ok) {
-    return;
-  }
-
-  const data: BuildMeta[] = await response.json();
-  selectedChampionBuilds.value = data;
+  selectedChampionBuilds.value = await getBuilds(championId);
 }
 
 function selectChampion(championId: string) {
@@ -176,20 +181,10 @@ function selectChampion(championId: string) {
 }
 
 async function selectBuild(build: BuildMeta) {
-  //   editItems.value?.cancelEditing();
-  console.log("editItems", editItems.value);
-  editItems.value?.cancelEditing();
-  const response = await fetch(
-    `/api/build/${build.champion}/${build.gameVersionMajor}/${build.gameVersionMinor}`
-  );
-  if (!response.ok) {
-    return;
-  }
-
-  let data: Build = await response.json();
-  let dataEdit = {
+  const data: Build = await getBuild(build.champion, build.gameVersion);
+  const dataEdit = {
     ...data,
-    version: { major: data.gameVersionMajor, minor: data.gameVersionMinor },
+    version: data.gameVersion,
     runes: {
       ...data.runes,
       secondarySelections: data.runes.secondarySelections.map((val) =>
@@ -201,7 +196,6 @@ async function selectBuild(build: BuildMeta) {
 }
 
 function validateBuild(build: BuildEdit): Build | null {
-  console.log("buildEdit", build);
   if (build.champion === "") {
     return null;
   }
@@ -237,15 +231,11 @@ function validateBuild(build: BuildEdit): Build | null {
       }
     }, 0) || 0;
 
-  console.log("numPrimary", numSelectedPrimary);
-  console.log("numSecondary", numSelectedSecondary);
-  console.log("numStats", numStats);
-
   if (numSelectedPrimary != 4 || numSelectedSecondary != 2 || numStats != 3) {
     return null;
   }
 
-  let validatedRunes: BuildRunes = {
+  const validatedRunes: BuildRunes = {
     primaryKey: build.runes.primaryKey,
     primarySelections: build.runes.primarySelections.map((val) => {
       if (val === null) {
@@ -270,45 +260,26 @@ function validateBuild(build: BuildEdit): Build | null {
       }
     }),
   };
-  let validatedBuild: Build = {
+  const validatedBuild: Build = {
     champion: build.champion,
-    gameVersionMajor: build.version.major,
-    gameVersionMinor: build.version.minor,
+    gameVersion: build.version,
     runes: validatedRunes,
     items: build.items,
     comment: build.comment,
   };
   return validatedBuild;
 }
-const validatedBuild = computed(() => {
-  if (editingBuild.value) {
-    const validateddBuild = validateBuild(editingBuild.value);
-    console.log("validatedBuild", validateddBuild);
-    return validateddBuild;
-  } else {
-    return null;
-  }
-});
-
-const stateStore = useStateStore();
 
 async function saveBuild() {
   const build = validatedBuild.value;
   if (build) {
-    const data = JSON.stringify(build);
-    const response = await fetch(`/api/build/`, {
-      method: "POST",
-      headers: stateStore.authHeaders,
-      body: data,
-    });
-    console.log(response);
-
+    await postBuild(build);
     await loadBuilds(selectedChampionId.value);
   }
 }
 
 function createNewBuild() {
-  let newBuild: BuildEdit = {
+  const newBuild: BuildEdit = {
     champion: selectedChampionId.value,
     version: dataDragonStore.currentVersion,
     runes: {

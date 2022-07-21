@@ -8,6 +8,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: builds
+    ports:
+      - 5432:5432
     volumes:
       - db-data:/var/lib/postgresql/data
 
@@ -19,7 +21,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DATABASE: builds
       POSTGRES_ADDRESS: db:5432
-      BIND_ADDRESS: :80
+      BIND_ADDRESS: :8080
     depends_on:
       - db
     labels:
@@ -27,30 +29,34 @@ services:
       - "traefik.http.routers.builds_backend.rule=PathPrefix(`/api/`)"
       - "traefik.http.routers.builds_backend.entrypoints=web"
       - "traefik.http.services.builds_backend.loadbalancer.server.port=80"
-
-  frontend:
-    image: aram-builds-frontend
-    build: ./frontend
-    depends_on:
-      - backend
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.builds_frontend.rule=PathPrefix(`/`)"
-      - "traefik.http.routers.builds_frontend.entrypoints=web"
-      - "traefik.http.services.builds_frontend.loadbalancer.server.port=80"
-
-  traefik:
-    restart: always
-    image: "traefik:v2.5"
-    container_name: "traefik"
     ports:
-      - 80:80
       - 8080:8080
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./traefik-dev.yml:/traefik.yml:ro"
 
 volumes:
   db-data:
+
+    # frontend:
+    #   image: aram-builds-frontend
+    #   build: ./frontend
+    #   depends_on:
+    #     - backend
+    #   ports:
+    #     - 3000:3000
+    #   labels:
+    #     - "traefik.enable=true"
+    #     - "traefik.http.routers.builds_frontend.rule=PathPrefix(`/`)"
+    #     - "traefik.http.routers.builds_frontend.entrypoints=web"
+    #     - "traefik.http.services.builds_frontend.loadbalancer.server.port=80"
+
+    # traefik:
+    #   restart: always
+    #   image: "traefik:v2.5"
+    #   container_name: "traefik"
+    #   ports:
+    #     - 80:80
+    #     - 8080:8080
+    #   volumes:
+    #     - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    #     - "./traefik-dev.yml:/traefik.yml:ro"
 
 

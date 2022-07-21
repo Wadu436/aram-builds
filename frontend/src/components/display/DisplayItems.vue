@@ -6,7 +6,7 @@
       <div class="bg-stone-800 p-4 rounded-md">
         <div>Starting Items</div>
         <div class="flex">
-          <div class="mr-2" v-for="itemId in build.items.start">
+          <div class="mr-2" v-for="itemId in build.items.start" :key="itemId">
             <ItemPortrait :item="itemsStore?.get(itemId)" />
           </div>
         </div>
@@ -19,7 +19,11 @@
       <div class="bg-stone-800 p-4 rounded-md mt-4">
         <div>Full Build</div>
         <div class="flex">
-          <div class="mr-2" v-for="itemId in build.items.fullbuild">
+          <div
+            class="mr-2"
+            v-for="itemId in build.items.fullbuild"
+            :key="itemId"
+          >
             <ItemPortrait :item="itemsStore?.get(itemId)" />
           </div>
         </div>
@@ -33,10 +37,9 @@
 </template>
 
 <script setup lang="ts">
-import { useDataDragonStore, versionToKey } from "@/stores/DataDragonStore";
-import { canonicalizeString } from "@/util";
-import type { Build } from "@/views/BuildView.vue";
-import { computed, ref, watch } from "vue";
+import { useDataDragonStore } from "@/stores/DataDragonStore";
+import type { Build } from "@/types";
+import { computed, watch } from "vue";
 import ItemPortrait from "../portraits/ItemPortrait.vue";
 
 const dataDragonStore = useDataDragonStore();
@@ -44,42 +47,17 @@ const dataDragonStore = useDataDragonStore();
 const props = defineProps<{ build: Build }>();
 
 const version = computed(() => {
-  const v = {
-    major: props.build.gameVersionMajor,
-    minor: props.build.gameVersionMinor,
-  };
-  console.log("v", v);
-  return v;
+  return props.build.gameVersion;
+});
+const itemsStore = computed(() => {
+  return dataDragonStore.items.get(version.value);
 });
 
 // Check if itemData needs to be loaded
 watch(version, (version) => {
-  console.log("version", version);
-  console.log("has version", dataDragonStore.items.has(versionToKey(version)));
-  if (!dataDragonStore.items.has(versionToKey(version))) {
+  if (!dataDragonStore.items.has(version)) {
     dataDragonStore.loadItems(version);
   }
-});
-
-const itemsStore = computed(() => {
-  return dataDragonStore.items.get(versionToKey(version.value));
-});
-
-const items = computed(() => {
-  const values = itemsStore.value?.values();
-  if (values) {
-    return [...values];
-  } else {
-    return [];
-  }
-});
-
-const search = ref("");
-
-const filteredItems = computed(() => {
-  return items.value.filter((item) =>
-    canonicalizeString(item.name).includes(canonicalizeString(search.value))
-  );
 });
 </script>
 

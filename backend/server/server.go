@@ -3,7 +3,6 @@ package server
 import (
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -74,8 +73,11 @@ func Server(config ServerConfig) {
 		c.JSON(http.StatusOK, builds)
 	})
 
-	build.GET("/:champion/latest", func(c *gin.Context) {
-		build, exists := db.LatestBuild(c.Param("champion"))
+	build.GET("/:champion/:version", func(c *gin.Context) {
+		champion := c.Param("champion")
+		version := c.Param("version")
+
+		build, exists := db.LoadBuild(champion, version)
 		if !exists {
 			ErrorNotFound(c)
 			return
@@ -83,30 +85,10 @@ func Server(config ServerConfig) {
 		c.JSON(http.StatusOK, build)
 	})
 
-	build.GET("/:champion/:major/:minor", func(c *gin.Context) {
+	buildAuth.DELETE("/:champion/:version", func(c *gin.Context) {
 		champion := c.Param("champion")
-		major, err1 := strconv.Atoi(c.Param("major"))
-		minor, err2 := strconv.Atoi(c.Param("minor"))
-		if err1 != nil || err2 != nil {
-			ErrorBadRequest(c)
-		}
-
-		build, exists := db.LoadBuild(champion, major, minor)
-		if !exists {
-			ErrorNotFound(c)
-			return
-		}
-		c.JSON(http.StatusOK, build)
-	})
-
-	buildAuth.DELETE("/:champion/:major/:minor", func(c *gin.Context) {
-		champion := c.Param("champion")
-		major, err1 := strconv.Atoi(c.Param("major"))
-		minor, err2 := strconv.Atoi(c.Param("minor"))
-		if err1 != nil || err2 != nil {
-			ErrorBadRequest(c)
-		}
-		db.DeleteBuild(champion, major, minor)
+		version := c.Param("version")
+		db.DeleteBuild(champion, version)
 	})
 
 	r.Run(config.BindAddr)

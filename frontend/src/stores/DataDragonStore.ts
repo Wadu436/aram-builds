@@ -1,80 +1,16 @@
+import type { RuneTree, Item, Champion, GameVersion, RuneStats } from "@/types";
 import { defineStore } from "pinia";
-
-const DATA_DRAGON_VERSIONS =
-  "https://ddragon.leagueoflegends.com/api/versions.json";
-const VERSION_REGEX = /^(\d+)\.(\d+)\.\d+$/;
 
 type DDState = {
   // first index is version (e.g. 12.13), second is tree key (e.g. Domination)
   runes: Map<string, Map<string, RuneTree>>;
   items: Map<string, Map<string, Item>>;
   champions: Map<string, Champion>;
-  versions: Map<string, string>;
-  gameVersions: Map<string, GameVersion>;
+  versions: Map<GameVersion, string>;
   statRunes: RuneStats;
   currentVersion: GameVersion;
 };
 
-export interface GameVersion {
-  major: number;
-  minor: number;
-}
-
-export function versionToKey(version: GameVersion) {
-  return `${version.major}_${version.minor}`;
-}
-
-export interface Champion {
-  id: string;
-  name: string;
-  title: string;
-  blurb: string;
-  image: string;
-  loading: string;
-  splash: string;
-  sprite: {
-    sprite: string;
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-  };
-}
-
-export interface Item {
-  id: string;
-  name: string;
-  image: string;
-  cost: number;
-  sprite: {
-    sprite: string;
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-  };
-}
-
-export interface RuneTree {
-  key: string;
-  icon: string;
-  name: string;
-  slots: {
-    key: string;
-    icon: string;
-    name: string;
-    shortDesc: string;
-    longDesc: string;
-  }[][];
-}
-
-export interface RuneStats {
-  slots: {
-    icon: string;
-    key: string;
-    name: string;
-  }[][];
-}
 interface DataDragonChampionResponse {
   data: {
     [key: string]: {
@@ -194,7 +130,6 @@ export const useDataDragonStore = defineStore({
       items: new Map(),
       champions: new Map(),
       versions: new Map(),
-      gameVersions: new Map(),
       statRunes: {},
       currentVersion: {},
     } as DDState),
@@ -205,7 +140,7 @@ export const useDataDragonStore = defineStore({
   },
   actions: {
     async loadChampions() {
-      const urlVersion = this.versions.get(versionToKey(this.currentVersion));
+      const urlVersion = this.versions.get(this.currentVersion);
 
       // Load champion info
       await fetch(
@@ -240,14 +175,10 @@ export const useDataDragonStore = defineStore({
     async loadRunes(version: GameVersion) {
       // Create the cache for this version if it doesn't exist yet
       const runeMap = new Map();
-      const urlVersion = this.versions.get(versionToKey(version));
-      console.log(urlVersion);
+      const urlVersion = this.versions.get(version);
       if (!urlVersion) {
         return;
       }
-      console.log(
-        `https://ddragon.leagueoflegends.com/cdn/${urlVersion}/data/en_US/runesReforged.json`
-      );
 
       // Load rune info
       await fetch(
@@ -272,14 +203,13 @@ export const useDataDragonStore = defineStore({
             });
           });
         });
-      this.runes.set(versionToKey(version), runeMap);
+      this.runes.set(version, runeMap);
     },
 
     async loadItems(version: GameVersion) {
       // Create the cache for this version if it doesn't exist yet
       const itemMap: Map<string, Item> = new Map();
-      const urlVersion = this.versions.get(versionToKey(version));
-      console.log(urlVersion);
+      const urlVersion = this.versions.get(version);
       if (!urlVersion) {
         return;
       }
@@ -291,7 +221,7 @@ export const useDataDragonStore = defineStore({
         .then((response) => response.json())
         .then((data: { data: { [key: string]: DataDragonItemResponse } }) => {
           Object.keys(data.data).forEach((key) => {
-            let item = data.data[key];
+            const item = data.data[key];
 
             if (
               item.hideFromAll ||
@@ -316,12 +246,7 @@ export const useDataDragonStore = defineStore({
             });
           });
         });
-      this.items.set(versionToKey(version), itemMap);
-
-      console.log(
-        "item 1001:",
-        this.items.get(versionToKey(version))?.get("1001")
-      );
+      this.items.set(version, itemMap);
     },
 
     async initialize() {
@@ -334,24 +259,17 @@ export const useDataDragonStore = defineStore({
       };
 
       // Get Versions
-      await fetch(DATA_DRAGON_VERSIONS)
+      await fetch("https://ddragon.leagueoflegends.com/api/versions.json")
         .then((response) => response.json())
         .then((data: [string]) => {
           data.reverse().forEach((version) => {
-            const match = version.match(VERSION_REGEX);
+            const match = version.match(/^(\d+)\.(\d+)\.\d+$/);
             if (match) {
-              const version = {
-                major: Number(match[1]),
-                minor: Number(match[2]),
-              };
-              this.versions.set(versionToKey(version), match[0]);
-              this.gameVersions.set(versionToKey(version), version);
-              this.currentVersion = version;
+              const v: GameVersion = `${Number(match[1])}.${Number(match[2])}`;
+              this.versions.set(v, match[0]);
+              this.currentVersion = v;
             }
           });
-
-          console.log(this.versions);
-          console.log(this.currentVersion);
           // this.versions = data[0];
         });
 
