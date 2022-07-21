@@ -209,13 +209,8 @@ const props = defineProps<{
   version: GameVersion;
 }>();
 const emit = defineEmits(["update:modelValue"]);
-// Take a copy of runes
 
-function loadRunes(version: GameVersion) {
-  if (!dataDragonStore.runes.has(version)) {
-    dataDragonStore.loadRunes(version);
-  }
-}
+const lastSelectedSecondarySlot: Ref<number | null> = ref(null);
 
 // Check if runeData needs to be loaded
 loadRunes(props.version);
@@ -223,10 +218,8 @@ watch(props, (props) => {
   loadRunes(props.version);
 });
 
+// Take a copy of runes
 const runeData = computed(() => dataDragonStore.runes.get(props.version));
-
-const lastSelectedSecondarySlot: Ref<number | null> = ref(null);
-
 const runeDataArray = computed(() => {
   if (runeData.value) {
     return [...runeData.value.values()];
@@ -234,7 +227,6 @@ const runeDataArray = computed(() => {
     return [];
   }
 });
-
 const runeDataPrimary = computed(() => {
   if (props.modelValue.primaryKey) {
     return runeData.value?.get(props.modelValue.primaryKey);
@@ -249,6 +241,22 @@ const runeDataSecondary = computed(() => {
     return undefined;
   }
 });
+const secondaryNumSelected = computed(
+  () =>
+    props.modelValue.secondarySelections.reduce((val, slot) => {
+      if (slot !== null) {
+        return (val || 0) + 1;
+      } else {
+        return val;
+      }
+    }, 0) || 0
+);
+
+function loadRunes(version: GameVersion) {
+  if (!dataDragonStore.runes.has(version)) {
+    dataDragonStore.loadRunes(version);
+  }
+}
 
 function changePrimaryTree(treeKey: string) {
   if (treeKey == runeDataPrimary.value?.key) {
@@ -278,17 +286,6 @@ function changePrimaryTreeRune(row: number, slot: number) {
   runesCopy.primarySelections[row] = slot;
   emit("update:modelValue", runesCopy);
 }
-
-const secondaryNumSelected = computed(
-  () =>
-    props.modelValue.secondarySelections.reduce((val, slot) => {
-      if (slot !== null) {
-        return (val || 0) + 1;
-      } else {
-        return val;
-      }
-    }, 0) || 0
-);
 
 function changeSecondaryTreeRune(row: number, slot: number) {
   const runesCopy = { ...props.modelValue };

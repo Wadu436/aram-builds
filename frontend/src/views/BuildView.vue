@@ -66,21 +66,29 @@ import IconBack from "../components/icons/IconBack.vue";
 import { getBuild, getBuilds } from "@/api";
 import { versionSortKey } from "@/util";
 
-const props = defineProps({
-  champion: String,
-});
-
-const championId = computed(() => props.champion || "");
-
 const dataDragonStore = useDataDragonStore();
 
-const champion = computed(() => {
-  return dataDragonStore.champions.get(championId.value);
+const props = defineProps({
+  champion: String,
 });
 
 const builds: Ref<GameVersion[]> = ref([]);
 const currentVersion: Ref<GameVersion | null> = ref(null);
 const currentBuild: Ref<Build | null> = ref(null);
+
+const championId = computed(() => props.champion || "");
+const champion = computed(() => {
+  return dataDragonStore.champions.get(championId.value);
+});
+
+setupBuilds();
+watch(currentVersion, (newVersion, oldVersion) => {
+  if (oldVersion !== newVersion) {
+    if (newVersion) {
+      loadBuild(newVersion);
+    }
+  }
+});
 
 async function setupBuilds() {
   const buildsTemp = (await getBuilds(championId.value)).map(
@@ -93,22 +101,9 @@ async function setupBuilds() {
 }
 
 async function loadBuild(version: GameVersion) {
-  //   let url = `/api/build/${championId.value}/latest`;
   const build = await getBuild(championId.value, version);
 
   currentBuild.value = build;
   currentVersion.value = build.gameVersion;
 }
-
-watch(currentVersion, (newVersion, oldVersion) => {
-  if (oldVersion !== newVersion) {
-    if (newVersion) {
-      loadBuild(newVersion);
-    }
-  }
-});
-
-setupBuilds();
-
-// const builds = reactive({});
 </script>

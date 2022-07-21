@@ -138,10 +138,14 @@ import EditItems from "../components/edit/EditItems.vue";
 
 import { getBuild, getBuilds, postBuild } from "@/api";
 
-const editItems: Ref<{ cancelEditing: () => void } | null> = ref(null);
-
-const searchString = ref("");
 const dataDragonStore = useDataDragonStore();
+
+const editItems: Ref<{ cancelEditing: () => void } | null> = ref(null);
+const searchString = ref("");
+const selectedChampionId = ref("");
+const editingBuild = ref<BuildEdit>();
+const selectedChampionBuilds: Ref<BuildMeta[]> = ref([]);
+
 const champions = computed(() => {
   return [...dataDragonStore.champions.values()];
 });
@@ -150,15 +154,18 @@ const filteredChampions = computed(() => {
     canonicalizeString(c.name).includes(canonicalizeString(searchString.value))
   );
 });
-
-const selectedChampionId = ref("");
 const selectedChampion = computed(() => {
   return dataDragonStore.champions.get(selectedChampionId.value);
 });
+const validatedBuild = computed(() => {
+  if (editingBuild.value) {
+    const validateddBuild = validateBuild(editingBuild.value);
+    return validateddBuild;
+  } else {
+    return null;
+  }
+});
 
-const editingBuild = ref<BuildEdit>();
-
-const selectedChampionBuilds: Ref<BuildMeta[]> = ref([]);
 watch(selectedChampionId, (championId) => {
   loadBuilds(championId);
   editingBuild.value = undefined;
@@ -262,14 +269,6 @@ function validateBuild(build: BuildEdit): Build | null {
   };
   return validatedBuild;
 }
-const validatedBuild = computed(() => {
-  if (editingBuild.value) {
-    const validateddBuild = validateBuild(editingBuild.value);
-    return validateddBuild;
-  } else {
-    return null;
-  }
-});
 
 async function saveBuild() {
   const build = validatedBuild.value;

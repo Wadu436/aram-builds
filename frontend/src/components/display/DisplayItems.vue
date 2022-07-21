@@ -49,16 +49,15 @@ const props = defineProps<{ build: Build }>();
 const version = computed(() => {
   return props.build.gameVersion;
 });
+const itemsStore = computed(() => {
+  return dataDragonStore.items.get(version.value);
+});
 
 // Check if itemData needs to be loaded
 watch(version, (version) => {
   if (!dataDragonStore.items.has(version)) {
     dataDragonStore.loadItems(version);
   }
-});
-
-const itemsStore = computed(() => {
-  return dataDragonStore.items.get(version.value);
 });
 </script>
 

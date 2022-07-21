@@ -198,18 +198,14 @@ const props = defineProps<{
   version: GameVersion;
 }>();
 const emit = defineEmits(["update:modelValue"]);
+defineExpose({ cancelEditing });
 
-function loadItems(version: GameVersion) {
-  if (!dataDragonStore.items.has(version)) {
-    dataDragonStore.loadItems(version);
-  }
-}
-
-// Check if runeData needs to be loaded
-loadItems(props.version);
-watch(props, (props) => {
-  loadItems(props.version);
-});
+const search = ref("");
+const dragging = ref(false);
+const editingStartComment = ref(false);
+const editingStartCommentText = ref("");
+const editingFullComment = ref(false);
+const editingFullCommentText = ref("");
 
 const itemsStore = computed(() => {
   return dataDragonStore.items.get(props.version);
@@ -224,15 +220,6 @@ const items = computed(() => {
   }
 });
 
-const search = ref("");
-
-const dragging = ref(false);
-
-const editingStartComment = ref(false);
-const editingStartCommentText = ref("");
-const editingFullComment = ref(false);
-const editingFullCommentText = ref("");
-
 const filteredItems = computed(() => {
   return items.value.filter((item) => {
     return canonicalizeString(itemsStore.value?.get(item)?.name || "").includes(
@@ -240,6 +227,18 @@ const filteredItems = computed(() => {
     );
   });
 });
+
+// Check if runeData needs to be loaded
+loadItems(props.version);
+watch(props, (props) => {
+  loadItems(props.version);
+});
+
+function loadItems(version: GameVersion) {
+  if (!dataDragonStore.items.has(version)) {
+    dataDragonStore.loadItems(version);
+  }
+}
 
 function changeStartComment() {
   const itemsCopy = { ...props.modelValue };
@@ -296,8 +295,6 @@ function emptyFullBuild() {
   emit("update:modelValue", itemsCopy);
   editingStartComment.value = false;
 }
-
-defineExpose({ cancelEditing });
 </script>
 
 <style scoped></style>

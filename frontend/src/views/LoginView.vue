@@ -50,12 +50,11 @@ import { useRouter, useRoute } from "vue-router";
 
 const stateStore = useStateStore();
 
-const username = ref("");
-const password = ref("");
-
 const router = useRouter();
 const route = useRoute();
 
+const username = ref("");
+const password = ref("");
 const message = ref("");
 
 const onLogin = async () => {
