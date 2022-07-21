@@ -186,7 +186,7 @@
 import { useDataDragonStore } from "@/stores/DataDragonStore";
 import type { GameVersion, BuildItems } from "@/types";
 import { canonicalizeString } from "@/util";
-import { computed, ref, watch, type Ref } from "vue";
+import { computed, ref, watch } from "vue";
 import ItemPortrait from "../portraits/ItemPortrait.vue";
 import draggable from "vuedraggable";
 import IconBin from "../icons/IconBin.vue";
