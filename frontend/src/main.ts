@@ -25,9 +25,7 @@ router.beforeEach((to) => {
 });
 
 (async () => {
-  stateStore.loading = true;
   await dataDragonStore.initialize();
-  stateStore.loading = false;
 })();
 
 app.mount("#app");

@@ -5,7 +5,6 @@ import { createAuthHeaders } from "@/util";
 export const useStateStore = defineStore({
   id: "state",
   state: () => ({
-    loading: true,
     user: useStorage("user", {
       authenticated: false,
 

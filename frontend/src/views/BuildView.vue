@@ -60,7 +60,6 @@
 import { useDataDragonStore } from "@/stores/DataDragonStore";
 import { computed, ref, watch, type Ref } from "vue";
 import type { Build, GameVersion } from "@/types";
-import { useStateStore } from "@/stores/state";
 import DisplayRunes from "../components/display/DisplayRunes.vue";
 import DisplayItems from "../components/display/DisplayItems.vue";
 import IconBack from "../components/icons/IconBack.vue";
@@ -74,7 +73,6 @@ const props = defineProps({
 const championId = computed(() => props.champion || "");
 
 const dataDragonStore = useDataDragonStore();
-const stateStore = useStateStore();
 
 const champion = computed(() => {
   return dataDragonStore.champions.get(championId.value);
@@ -85,7 +83,6 @@ const currentVersion: Ref<GameVersion | null> = ref(null);
 const currentBuild: Ref<Build | null> = ref(null);
 
 async function setupBuilds() {
-  stateStore.loading = true;
   const buildsTemp = (await getBuilds(championId.value)).map(
     (meta) => meta.gameVersion
   );

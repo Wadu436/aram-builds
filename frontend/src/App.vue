@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { RouterView } from "vue-router";
-import LoadingOverlay from "./components/overlays/LoadingOverlay.vue";
 
 // const open = ref(false);
 
@@ -51,7 +50,6 @@ import LoadingOverlay from "./components/overlays/LoadingOverlay.vue";
       </div>
     </nav> -->
     <div class="relative overflow-hidden flex-auto flex">
-      <LoadingOverlay />
       <RouterView />
     </div>
   </div>
