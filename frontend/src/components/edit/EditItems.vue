@@ -57,7 +57,7 @@
             </button>
           </div>
           <draggable
-            :list="modelValue.start"
+            v-model="startItems"
             :group="{ name: 'itemsBox', pull: true, put: true }"
             class="mr-2 flex min-h-[2rem] bg-stone-700 rounded-md p-2 gap-2 flex-wrap"
             @dragstart="dragging = true"
@@ -122,7 +122,7 @@
             </button>
           </div>
           <draggable
-            :list="modelValue.fullbuild"
+            v-model="fullbuildItems"
             :group="{ name: 'itemsBox', pull: true, put: true }"
             class="mr-2 flex min-h-[2rem] bg-stone-700 rounded-md p-2 gap-2 flex-wrap"
             @dragstart="dragging = true"
@@ -186,7 +186,7 @@
 import { useDataDragonStore } from "@/stores/DataDragonStore";
 import type { GameVersion, BuildItems } from "@/types";
 import { canonicalizeString } from "@/util";
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, type Ref } from "vue";
 import ItemPortrait from "../portraits/ItemPortrait.vue";
 import draggable from "vuedraggable";
 import IconBin from "../icons/IconBin.vue";
@@ -254,6 +254,29 @@ function changeFullBuildComment() {
   emit("update:modelValue", itemsCopy);
   editingFullComment.value = false;
 }
+
+const startItems = computed({
+  get: () => {
+    return props.modelValue.start;
+  },
+  set: (newStart) => {
+    const itemsCopy = { ...props.modelValue };
+    itemsCopy.start = newStart;
+    emit("update:modelValue", itemsCopy);
+    editingStartComment.value = false;
+  },
+});
+const fullbuildItems = computed({
+  get: () => {
+    return props.modelValue.fullbuild;
+  },
+  set: (newFullbuild) => {
+    const itemsCopy = { ...props.modelValue };
+    itemsCopy.fullbuild = newFullbuild;
+    emit("update:modelValue", itemsCopy);
+    editingStartComment.value = false;
+  },
+});
 
 function cancelEditing() {
   editingStartComment.value = false;
