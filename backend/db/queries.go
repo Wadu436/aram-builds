@@ -44,6 +44,7 @@ func LoadBuild(champion string, gameVersion string) (Build, error) {
 }
 
 func StoreBuild(build Build) {
+	log.Printf("STORE build.SkillOrder: %v", build.SkillOrder)
 	fmt.Println(build.Runes.Stats)
 	_, err := dbpool.Exec(context.Background(),
 		`INSERT INTO builds (champion, game_version, mtime, 
@@ -135,5 +136,6 @@ func BuildReadRow(row pgx.Row) (Build, error) {
 	if stats != nil {
 		build.Runes.Stats = *stats
 	}
+	log.Printf("LOAD build.SkillOrder: %v", build.SkillOrder)
 	return build, nil
 }

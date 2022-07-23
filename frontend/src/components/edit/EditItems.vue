@@ -1,7 +1,5 @@
 <template>
   <div class="text-xl flex flex-col items-center mx-4">
-    <div class="text-2xl">Items</div>
-
     <div class="flex overflow-hidden">
       <div
         class="flex flex-col overflow-hidden items-center p-4 mr-4 mb-4 bg-stone-800 rounded-md flex-1"

@@ -38,6 +38,7 @@ interface ChampionResponse {
       blurb: string;
       image: RiotImage;
       spells: {
+        maxrank: number;
         image: RiotImage;
       }[];
     };
@@ -174,6 +175,7 @@ export const useDataDragonStore = defineStore({
                     w: value.spells[val].image.w,
                     h: value.spells[val].image.h,
                   },
+                  maxrank: value.spells[val].maxrank,
                 };
               });
               this.champions.set(value.id, {

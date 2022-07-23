@@ -52,7 +52,7 @@ export interface BuildEdit {
   items: BuildItems;
   comment: string;
   summoners: string[];
-  skillOrder?: number[];
+  skillOrder: (number | null)[];
   tier?: number;
 }
 
@@ -67,7 +67,7 @@ export interface Champion {
   loading: string;
   splash: string;
   sprite: Sprite;
-  spells: { image: string; sprite: Sprite }[];
+  spells: { image: string; sprite: Sprite; maxrank: number }[];
 }
 
 export interface Item {
