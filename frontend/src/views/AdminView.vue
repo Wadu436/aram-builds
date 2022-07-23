@@ -117,12 +117,7 @@
               <div>Summoner Spells:</div>
               <div class="flex">
                 <EditSummonersButton
-                  v-model="editingBuild.summoners[0]"
-                  :version="editingBuild.version"
-                  :edit="true"
-                ></EditSummonersButton>
-                <EditSummonersButton
-                  v-model="editingBuild.summoners[1]"
+                  v-model="editingBuild.summoners"
                   :version="editingBuild.version"
                   :edit="true"
                 ></EditSummonersButton>
@@ -152,7 +147,7 @@ import EditRunes from "../components/edit/EditRunes.vue";
 import EditItems from "../components/edit/EditItems.vue";
 
 import { getBuild, getBuilds, postBuild } from "@/api";
-import EditSummonersButton from "../components/edit/EditSummonersButton.vue";
+import EditSummonersButton from "../components/edit/EditSummoners.vue";
 
 const dataDragonStore = useDataDragonStore();
 
