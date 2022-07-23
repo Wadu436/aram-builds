@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v4"
 	"github.com/wadu436/aram-builds/backend/db"
 	auth "github.com/wadu436/gin-auth"
 )
@@ -41,6 +42,10 @@ func Server(config ServerConfig) {
 
 	build.GET("/", func(c *gin.Context) {
 		builds, err := db.AllBuilds()
+		if err == pgx.ErrNoRows {
+			ErrorNotFound(c)
+			return
+		}
 		if err != nil {
 			log.Println(err)
 			ErrorDatabase(c)
@@ -65,6 +70,10 @@ func Server(config ServerConfig) {
 
 	build.GET("/:champion/", func(c *gin.Context) {
 		builds, err := db.AllBuildsChampion(c.Param("champion"))
+		if err == pgx.ErrNoRows {
+			ErrorNotFound(c)
+			return
+		}
 		if err != nil {
 			log.Println(err)
 			ErrorDatabase(c)
@@ -77,18 +86,26 @@ func Server(config ServerConfig) {
 		champion := c.Param("champion")
 		version := c.Param("version")
 
-		build, exists := db.LoadBuild(champion, version)
-		if !exists {
+		build, err := db.LoadBuild(champion, version)
+		if err == pgx.ErrNoRows {
 			ErrorNotFound(c)
 			return
 		}
+		if err != nil {
+			ErrorDatabase(c)
+			return
+		}
+
 		c.JSON(http.StatusOK, build)
 	})
 
 	buildAuth.DELETE("/:champion/:version", func(c *gin.Context) {
 		champion := c.Param("champion")
 		version := c.Param("version")
-		db.DeleteBuild(champion, version)
+		err := db.DeleteBuild(champion, version)
+		if err != nil {
+			ErrorDatabase(c)
+		}
 	})
 
 	r.Run(config.BindAddr)
@@ -96,7 +113,7 @@ func Server(config ServerConfig) {
 
 // Errors
 func ErrorDatabase(c *gin.Context) {
-	c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"code": 1, "message": "Database error"})
+	c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"code": 1, "message": "Database error"})
 }
 
 func ErrorBadRequest(c *gin.Context) {

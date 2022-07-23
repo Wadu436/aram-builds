@@ -11,16 +11,16 @@ import (
 )
 
 // Load and Store User
-func LoadUser(username string) (auth.User, bool) {
+func LoadUser(username string) (auth.User, error) {
 	var user auth.User
 	row := dbpool.QueryRow(context.Background(), "SELECT username, password, salt FROM users WHERE username = $1;", username)
 
 	err := row.Scan(&user.Username, &user.Password, &user.Salt)
 	if err != nil {
-		return auth.User{}, false
+		return auth.User{}, err
 	}
 
-	return user, true
+	return user, nil
 }
 
 func StoreUser(user auth.User) {
@@ -32,15 +32,15 @@ func StoreUser(user auth.User) {
 }
 
 // Load and Store Build
-func LoadBuild(champion string, gameVersion string) (Build, bool) {
+func LoadBuild(champion string, gameVersion string) (Build, error) {
 	row := dbpool.QueryRow(context.Background(), "SELECT * FROM builds WHERE champion = $1 AND game_version = $2;", champion, gameVersion)
 
 	build, err := BuildReadRow(row)
 	if err != nil {
-		return Build{}, false
+		return Build{}, err
 	}
 
-	return build, true
+	return build, nil
 }
 
 func StoreBuild(build Build) {
@@ -48,8 +48,8 @@ func StoreBuild(build Build) {
 	_, err := dbpool.Exec(context.Background(),
 		`INSERT INTO builds (champion, game_version, mtime, 
 			runesPrimaryKey, runesPrimarySelections, runesSecondaryKey, runesSecondarySelections, runesStats, 
-			itemsStart, itemsFullBuild, comment, itemsStartComment, itemsFullBuildComment) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) ON CONFLICT (champion, game_version) 
+			itemsStart, itemsFullBuild, comment, itemsStartComment, itemsFullBuildComment, summoners, skill_order, tier) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) ON CONFLICT (champion, game_version) 
 		DO UPDATE SET 
 			mtime = EXCLUDED.mtime, 
 			runesPrimaryKey = EXCLUDED.runesPrimaryKey,
@@ -61,11 +61,14 @@ func StoreBuild(build Build) {
 			itemsFullBuild = EXCLUDED.itemsFullBuild,
 			comment = EXCLUDED.comment,
 			itemsStartComment = EXCLUDED.itemsStartComment,
-			itemsFullBuildComment = EXCLUDED.itemsFullBuildComment;`,
+			itemsFullBuildComment = EXCLUDED.itemsFullBuildComment,
+			summoners = EXCLUDED.summoners,
+			skill_order = EXCLUDED.skill_order,
+			tier = EXCLUDED.tier;`,
 		build.Champion, build.GameVersion, build.Mtime,
 		build.Runes.PrimaryKey, build.Runes.PrimarySelections,
 		build.Runes.SecondaryKey, build.Runes.SecondarySelections, build.Runes.Stats,
-		build.Items.Start, build.Items.FullBuild, build.Comment, build.Items.StartComment, build.Items.FullBuildComment)
+		build.Items.Start, build.Items.FullBuild, build.Comment, build.Items.StartComment, build.Items.FullBuildComment, build.Summoners, build.SkillOrder, build.Tier)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -119,7 +122,7 @@ func BuildReadRow(row pgx.Row) (Build, error) {
 	var secondarySelections *[3]int = nil
 	var stats *[3]int = nil
 
-	if err := row.Scan(&build.Champion, (*time.Time)(&build.Mtime), &build.Runes.PrimaryKey, &primarySelections, &build.Runes.SecondaryKey, &secondarySelections, &stats, &build.Items.Start, &build.Items.FullBuild, &build.Comment, &build.Items.StartComment, &build.Items.FullBuildComment, &build.GameVersion); err != nil {
+	if err := row.Scan(&build.Champion, (*time.Time)(&build.Mtime), &build.Runes.PrimaryKey, &primarySelections, &build.Runes.SecondaryKey, &secondarySelections, &stats, &build.Items.Start, &build.Items.FullBuild, &build.Comment, &build.Items.StartComment, &build.Items.FullBuildComment, &build.GameVersion, &build.Summoners, &build.SkillOrder, &build.Tier); err != nil {
 		return Build{}, err
 	}
 
