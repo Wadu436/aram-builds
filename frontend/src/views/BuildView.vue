@@ -40,7 +40,6 @@
         </div>
         <div class="flex gap-4 mt-4">
           <div class="flex flex-col items-center">
-            <div class="text-xl">Summoners</div>
             <EditSummonersButton
               v-if="currentBuild"
               v-model="currentBuild.summoners"
@@ -48,13 +47,11 @@
               :version="currentBuild.gameVersion"
             ></EditSummonersButton>
           </div>
-          <div class="flex flex-col items-center">
-            <div class="text-xl">Tier</div>
-            <div
-              class="text-4xl flex-grow flex justify-center items-center bg-stone-800 p-4 rounded-md"
-            >
+          <div class="flex items-center bg-stone-800 p-4 rounded-md gap-3">
+            <div class="text-3xl flex-grow flex justify-center items-center">
               B
             </div>
+            <div class="text-lg">Tier</div>
           </div>
         </div>
         <div v-if="currentBuild" class="mt-4 w-full flex flex-col items-center">
@@ -65,11 +62,9 @@
       </div>
     </div>
     <div
-      class="lg:flex-auto lg:basis-5/12 flex flex-col items-center justify-center"
+      class="lg:flex-auto lg:basis-5/12 flex flex-col items-center justify-center gap-4"
     >
-      <div class="text-xl mt-4">Runes</div>
       <DisplayRunes v-if="currentBuild" :build="currentBuild" />
-      <div class="text-xl mt-4">Skill Order</div>
       <EditSkills
         :edit="false"
         v-if="currentBuild?.skillOrder"
@@ -82,7 +77,6 @@
     <div
       class="lg:flex-auto lg:basis-1/4 flex flex-col items-center justify-center"
     >
-      <div class="text-xl">Items</div>
       <DisplayItems v-if="currentBuild" :build="currentBuild" />
     </div>
   </div>
