@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
 import { useDataDragonStore } from "@/stores/DataDragonStore";
-import type { Build, GameVersion } from "@/types";
+import type { GameVersion } from "@/types";
 import { computed } from "vue";
 
 const dataDragonStore = useDataDragonStore();
