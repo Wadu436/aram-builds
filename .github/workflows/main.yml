@@ -76,4 +76,4 @@ jobs:
             docker compose pull && \
             docker compose run backend ./backend migrate && \
             docker compose up -d
-          command_timeout: 30s
+          command_timeout: 300s
