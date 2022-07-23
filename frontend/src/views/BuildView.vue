@@ -38,6 +38,25 @@
           </div>
           <div v-else>There are no builds available for this champion</div>
         </div>
+        <div class="flex gap-4 mt-4">
+          <div class="flex flex-col items-center">
+            <div class="text-xl">Summoners</div>
+            <EditSummonersButton
+              v-if="currentBuild"
+              v-model="currentBuild.summoners"
+              :edit="false"
+              :version="currentBuild.gameVersion"
+            ></EditSummonersButton>
+          </div>
+          <div class="flex flex-col items-center">
+            <div class="text-xl">Tier</div>
+            <div
+              class="text-4xl flex-grow flex justify-center items-center bg-stone-800 p-4 rounded-md"
+            >
+              B
+            </div>
+          </div>
+        </div>
         <div v-if="currentBuild" class="mt-4 w-full flex flex-col items-center">
           <div class="whitespace-pre-wrap bg-stone-800 p-4 rounded-md w-full">
             {{ currentBuild?.comment }}
@@ -48,13 +67,6 @@
     <div
       class="lg:flex-auto lg:basis-5/12 flex flex-col items-center justify-center"
     >
-      <div class="text-xl mt-4">Summoners</div>
-      <EditSummonersButton
-        v-if="currentBuild"
-        v-model="currentBuild.summoners"
-        :edit="false"
-        :version="currentBuild.gameVersion"
-      ></EditSummonersButton>
       <div class="text-xl mt-4">Runes</div>
       <DisplayRunes v-if="currentBuild" :build="currentBuild" />
       <div class="text-xl mt-4">Skill Order</div>
