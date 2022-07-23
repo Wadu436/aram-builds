@@ -1,5 +1,5 @@
 <template>
-  <div class="flex p-4 bg-stone-800 rounded-md gap-4">
+  <div class="flex p-4 bg-stone-800 rounded-md gap-2">
     <Popper
       v-if="summonersStore"
       :disabled="!props.edit"
@@ -15,7 +15,12 @@
           'cursor-pointer': edit,
         }"
       >
-        <img class="rounded-md" v-if="imgUrlFirst" :src="imgUrlFirst" alt="" />
+        <img
+          class="rounded-md w-10 h-10"
+          v-if="imgUrlFirst"
+          :src="imgUrlFirst"
+          alt=""
+        />
       </div>
       <template #content>
         <div
@@ -30,7 +35,7 @@
               }
             "
           >
-            <img :src="spell.image" alt="" class="rounded-md" />
+            <img :src="spell.image" alt="" class="rounded-md w-10 h-10" />
           </button>
         </div>
       </template>
@@ -51,7 +56,7 @@
         }"
       >
         <img
-          class="rounded-md"
+          class="rounded-md w-10 h-10"
           v-if="imgUrlSecond"
           :src="imgUrlSecond"
           alt=""
@@ -70,7 +75,7 @@
               }
             "
           >
-            <img :src="spell.image" alt="" class="rounded-md" />
+            <img :src="spell.image" alt="" class="rounded-md w-10 h-10" />
           </button>
         </div>
       </template>

@@ -48,9 +48,16 @@
     <div
       class="lg:flex-auto lg:basis-5/12 flex flex-col items-center justify-center"
     >
-      <div class="text-2xl">Runes</div>
+      <div class="text-xl mt-4">Summoners</div>
+      <EditSummonersButton
+        v-if="currentBuild"
+        v-model="currentBuild.summoners"
+        :edit="false"
+        :version="currentBuild.gameVersion"
+      ></EditSummonersButton>
+      <div class="text-xl mt-4">Runes</div>
       <DisplayRunes v-if="currentBuild" :build="currentBuild" />
-      <div class="text-2xl mt-4">Skill Order</div>
+      <div class="text-xl mt-4">Skill Order</div>
       <EditSkills
         :edit="false"
         v-if="currentBuild?.skillOrder"
@@ -63,15 +70,8 @@
     <div
       class="lg:flex-auto lg:basis-1/4 flex flex-col items-center justify-center"
     >
-      <div class="text-2xl">Items</div>
+      <div class="text-xl">Items</div>
       <DisplayItems v-if="currentBuild" :build="currentBuild" />
-      <div class="text-2xl mt-4">Summoners</div>
-      <EditSummonersButton
-        v-if="currentBuild"
-        v-model="currentBuild.summoners"
-        :edit="false"
-        :version="currentBuild.gameVersion"
-      ></EditSummonersButton>
     </div>
   </div>
 </template>
