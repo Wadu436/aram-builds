@@ -38,10 +38,8 @@ interface ChampionResponse {
       blurb: string;
       image: RiotImage;
       spells: {
-        [key: number]: {
-          image: RiotImage;
-        };
-      };
+        image: RiotImage;
+      }[];
     };
   };
 }
@@ -87,6 +85,7 @@ interface SummonerResponse {
   id: string;
   name: string;
   image: RiotImage;
+  modes: string[];
 }
 
 // Load stat runes
@@ -299,6 +298,10 @@ export const useDataDragonStore = defineStore({
         .then((data: { data: { [key: string]: SummonerResponse } }) => {
           Object.keys(data.data).forEach((key) => {
             const item = data.data[key];
+
+            if (!item.modes.includes("ARAM")) {
+              return;
+            }
 
             summonerMap.set(key, {
               id: key,
