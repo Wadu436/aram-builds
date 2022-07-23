@@ -1,7 +1,5 @@
 <template>
   <div class="text-xl flex flex-col items-center mx-4">
-    <div class="text-2xl">Items</div>
-
     <div class="flex overflow-hidden">
       <div
         class="flex flex-col overflow-hidden items-center p-4 mr-4 mb-4 bg-stone-800 rounded-md flex-1"
@@ -229,14 +227,14 @@ const filteredItems = computed(() => {
 });
 
 // Check if runeData needs to be loaded
-loadItems(props.version);
+loadData(props.version);
 watch(props, (props) => {
-  loadItems(props.version);
+  loadData(props.version);
 });
 
-function loadItems(version: GameVersion) {
+function loadData(version: GameVersion) {
   if (!dataDragonStore.items.has(version)) {
-    dataDragonStore.loadItems(version);
+    dataDragonStore.loadData(version);
   }
 }
 

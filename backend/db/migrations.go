@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-var MIGRATIONS []string = []string{"000_create_users.sql", "001_create_builds.sql", "002_add_comments_field.sql", "003_add_comments_for_items.sql", "004_allow_null_arrays.sql", "005_change_game_version.sql"}
+var MIGRATIONS []string = []string{"000_create_users.sql", "001_create_builds.sql", "002_add_comments_field.sql", "003_add_comments_for_items.sql", "004_allow_null_arrays.sql", "005_change_game_version.sql", "006_add_summs_skills_tiers.sql"}
 
 //go:embed migrations/*
 var f embed.FS

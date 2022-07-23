@@ -85,40 +85,82 @@
               :version="editingBuild.version"
             ></EditRunes>
             <div class="flex gap-2 justify-center items-center mt-3">
-              <div>Version:</div>
-              <select
-                name=""
-                id=""
-                class="bg-stone-700 p-2 rounded-md"
-                v-model="editingBuild.version"
-              >
-                <option
-                  :value="version"
-                  v-for="version in [
-                    ...dataDragonStore.versions.keys(),
-                  ].reverse()"
-                  :key="version"
+              <div>
+                <div>Version:</div>
+                <select
+                  name=""
+                  id=""
+                  class="bg-stone-700 p-2 rounded-md"
+                  v-model="editingBuild.version"
                 >
-                  {{ version }}
-                </option>
-              </select>
+                  <option
+                    :value="version"
+                    v-for="version in [
+                      ...dataDragonStore.versions.keys(),
+                    ].reverse()"
+                    :key="version"
+                  >
+                    {{ version }}
+                  </option>
+                </select>
+              </div>
+              <div>
+                <div>Tier:</div>
+                <select
+                  name=""
+                  id=""
+                  class="bg-stone-700 p-2 rounded-md"
+                  v-model="editingBuild.tier"
+                >
+                  <option :value="null">No Tier</option>
+                  <option
+                    :value="tier.key"
+                    v-for="tier in tiers"
+                    :key="tier.key"
+                  >
+                    {{ tier.text }}
+                  </option>
+                </select>
+              </div>
             </div>
             <div class="flex gap-2 justify-center items-center mt-3">
               <div>Comment:</div>
               <textarea
                 name=""
                 id=""
-                class="bg-stone-700 p-2 rounded-md flex-grow h-60"
+                class="bg-stone-700 p-2 rounded-md flex-grow mx-4 h-60"
                 v-model="editingBuild.comment"
               >
               </textarea>
             </div>
+            <div class="flex gap-2 justify-center items-center mt-3">
+              <div>Summoner Spells:</div>
+              <div class="flex">
+                <EditSummonersButton
+                  v-model="editingBuild.summoners"
+                  :version="editingBuild.version"
+                  :edit="true"
+                ></EditSummonersButton>
+              </div>
+            </div>
           </div>
-          <EditItems
-            v-model="editingBuild.items"
-            :version="editingBuild.version"
-            ref="editItems"
-          ></EditItems>
+          <div class="flex flex-col items-center">
+            <div class="text-2xl">Items</div>
+            <EditItems
+              class="basis-2/3 overflow-auto"
+              v-model="editingBuild.items"
+              :version="editingBuild.version"
+              ref="editItems"
+            ></EditItems>
+            <div class="text-2xl">Skills</div>
+            <EditSkills
+              class="basis-1/3 overflow-auto"
+              v-model="editingBuild.skillOrder"
+              :version="editingBuild.version"
+              :edit="true"
+              :champion="editingBuild.champion"
+            ></EditSkills>
+          </div>
         </div>
       </div>
     </div>
@@ -127,7 +169,7 @@
 
 <script setup lang="ts">
 import { useDataDragonStore } from "@/stores/DataDragonStore";
-import { canonicalizeString } from "@/util";
+import { canonicalizeString, tiers } from "@/util";
 import { ref, computed, type Ref, watch } from "vue";
 import ChampionPortrait from "../components/portraits/ChampionPortrait.vue";
 
@@ -137,6 +179,8 @@ import EditRunes from "../components/edit/EditRunes.vue";
 import EditItems from "../components/edit/EditItems.vue";
 
 import { getBuild, getBuilds, postBuild } from "@/api";
+import EditSummonersButton from "../components/edit/EditSummoners.vue";
+import EditSkills from "../components/edit/EditSkills.vue";
 
 const dataDragonStore = useDataDragonStore();
 
@@ -182,7 +226,7 @@ function selectChampion(championId: string) {
 
 async function selectBuild(build: BuildMeta) {
   const data: Build = await getBuild(build.champion, build.gameVersion);
-  const dataEdit = {
+  const dataEdit: BuildEdit = {
     ...data,
     version: data.gameVersion,
     runes: {
@@ -191,7 +235,9 @@ async function selectBuild(build: BuildMeta) {
         val < 0 ? null : val
       ),
     },
+    skillOrder: data.skillOrder || Array(18).fill(null),
   };
+
   editingBuild.value = dataEdit;
 }
 
@@ -260,12 +306,29 @@ function validateBuild(build: BuildEdit): Build | null {
       }
     }),
   };
+
+  const skillOrder: number[] = [];
+  let validSkillOrder = true;
+  build.skillOrder.forEach((val) => {
+    if (val === null) {
+      validSkillOrder = false;
+    } else {
+      skillOrder.push(val);
+    }
+  });
+
+  console.log("vso", validSkillOrder);
+  console.log("so", skillOrder);
+
   const validatedBuild: Build = {
     champion: build.champion,
     gameVersion: build.version,
     runes: validatedRunes,
     items: build.items,
     comment: build.comment,
+    summoners: build.summoners,
+    skillOrder: validSkillOrder ? skillOrder : undefined,
+    tier: build.tier,
   };
   return validatedBuild;
 }
@@ -296,6 +359,8 @@ function createNewBuild() {
       fullbuildComment: "",
     },
     comment: "",
+    summoners: ["SummonerSnowball", "SummonerFlash"],
+    skillOrder: Array(18).fill(null),
   };
   editingBuild.value = newBuild;
 }

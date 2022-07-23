@@ -5,7 +5,7 @@
         ><IconBack
       /></RouterLink>
     </div>
-    <div class="lg:flex-auto lg:basis-1/5 overflow-y-auto thin-scrollbar">
+    <div class="lg:flex-auto lg:basis-1/6 overflow-y-auto thin-scrollbar">
       <div class="flex flex-col items-center justify-center p-4">
         <div class="flex relative">
           <div class="flex flex-col items-center justify-center">
@@ -38,6 +38,28 @@
           </div>
           <div v-else>There are no builds available for this champion</div>
         </div>
+        <div class="flex gap-4 mt-4">
+          <div class="flex flex-col items-center">
+            <EditSummonersButton
+              v-if="currentBuild"
+              v-model="currentBuild.summoners"
+              :edit="false"
+              :version="currentBuild.gameVersion"
+            ></EditSummonersButton>
+          </div>
+          <div class="flex items-center bg-stone-800 p-4 rounded-md gap-3">
+            <div
+              class="text-3xl w-8 flex-grow flex justify-center items-center"
+            >
+              {{
+                (currentBuild?.tier
+                  ? tiersMap.get(currentBuild?.tier)
+                  : null) || "-"
+              }}
+            </div>
+            <div class="text-lg">Tier</div>
+          </div>
+        </div>
         <div v-if="currentBuild" class="mt-4 w-full flex flex-col items-center">
           <div class="whitespace-pre-wrap bg-stone-800 p-4 rounded-md w-full">
             {{ currentBuild?.comment }}
@@ -45,11 +67,21 @@
         </div>
       </div>
     </div>
-    <div class="lg:flex-auto lg:basis-2/5 flex items-center justify-center">
-      <DisplayRunes v-if="currentBuild" :build="currentBuild" />
-    </div>
     <div
-      class="lg:flex-auto lg:basis-2/5 flex items-center justify-center text-3xl"
+      class="lg:flex-auto lg:basis-5/12 flex flex-col items-center justify-center gap-4"
+    >
+      <DisplayRunes v-if="currentBuild" :build="currentBuild" />
+      <EditSkills
+        :edit="false"
+        v-if="currentBuild?.skillOrder"
+        v-model="currentBuild.skillOrder"
+        :champion="currentBuild.champion"
+        :version="currentBuild.gameVersion"
+      />
+    </div>
+
+    <div
+      class="lg:flex-auto lg:basis-1/4 flex flex-col items-center justify-center"
     >
       <DisplayItems v-if="currentBuild" :build="currentBuild" />
     </div>
@@ -64,7 +96,9 @@ import DisplayRunes from "../components/display/DisplayRunes.vue";
 import DisplayItems from "../components/display/DisplayItems.vue";
 import IconBack from "../components/icons/IconBack.vue";
 import { getBuild, getBuilds } from "@/api";
-import { versionSortKey } from "@/util";
+import { versionSortKey, tiersMap } from "@/util";
+import EditSummonersButton from "../components/edit/EditSummoners.vue";
+import EditSkills from "../components/edit/EditSkills.vue";
 
 const dataDragonStore = useDataDragonStore();
 

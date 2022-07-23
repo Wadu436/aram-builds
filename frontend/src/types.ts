@@ -1,3 +1,11 @@
+export interface Sprite {
+  sprite: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
 export interface BuildMeta {
   champion: string;
   gameVersion: GameVersion;
@@ -32,6 +40,9 @@ export interface Build {
   runes: BuildRunes;
   items: BuildItems;
   comment: string;
+  summoners: string[];
+  skillOrder?: number[];
+  tier?: number;
 }
 
 export interface BuildEdit {
@@ -40,9 +51,12 @@ export interface BuildEdit {
   runes: BuildRunesEdit;
   items: BuildItems;
   comment: string;
+  summoners: string[];
+  skillOrder: (number | null)[];
+  tier?: number;
 }
 
-export type GameVersion = `${number}.${number}`;
+export type GameVersion = string;
 
 export interface Champion {
   id: string;
@@ -52,13 +66,8 @@ export interface Champion {
   image: string;
   loading: string;
   splash: string;
-  sprite: {
-    sprite: string;
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-  };
+  sprite: Sprite;
+  spells: { image: string; sprite: Sprite; maxrank: number }[];
 }
 
 export interface Item {
@@ -66,13 +75,7 @@ export interface Item {
   name: string;
   image: string;
   cost: number;
-  sprite: {
-    sprite: string;
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-  };
+  sprite: Sprite;
 }
 
 export interface RuneTree {
@@ -94,4 +97,17 @@ export interface RuneStats {
     key: string;
     name: string;
   }[][];
+}
+
+export interface Summoner {
+  id: string;
+  name: string;
+  image: string;
+  sprite: {
+    sprite: string;
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+  };
 }

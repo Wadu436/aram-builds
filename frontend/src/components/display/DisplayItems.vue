@@ -1,6 +1,5 @@
 <template>
   <div class="w-11/12 text-xl flex flex-col items-center">
-    <div class="text-2xl">Items</div>
     <div class="flex flex-col w-80">
       <!-- Starter -->
       <div class="bg-stone-800 p-4 rounded-md">
@@ -56,7 +55,7 @@ const itemsStore = computed(() => {
 // Check if itemData needs to be loaded
 watch(version, (version) => {
   if (!dataDragonStore.items.has(version)) {
-    dataDragonStore.loadItems(version);
+    dataDragonStore.loadData(version);
   }
 });
 </script>

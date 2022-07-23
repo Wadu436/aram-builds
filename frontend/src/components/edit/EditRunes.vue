@@ -3,9 +3,9 @@
     class="w-11/12 flex flex-col items-center select-none flex-1 max-w-fit mx-4"
   >
     <div class="text-2xl">Runes</div>
-    <div class="flex bg-stone-800 w-fit p-4 rounded-md">
+    <div class="flex w-fit">
       <!-- First Column -->
-      <div class="w-56 mx-2">
+      <div class="w-56 mx-2 bg-stone-800 p-4 rounded-md">
         <!-- Primary Tree -->
         <div>
           <!-- Title -->
@@ -93,7 +93,7 @@
       <!-- <div class="w-1 bg-stone-700 rounded-md"></div> -->
 
       <!-- Second Column -->
-      <div class="w-56 mx-2">
+      <div class="w-56 mx-2 bg-stone-800 p-4 rounded-md">
         <!-- Secondary Tree -->
         <div>
           <!-- Title -->
@@ -213,9 +213,9 @@ const emit = defineEmits(["update:modelValue"]);
 const lastSelectedSecondarySlot: Ref<number | null> = ref(null);
 
 // Check if runeData needs to be loaded
-loadRunes(props.version);
+loadData(props.version);
 watch(props, (props) => {
-  loadRunes(props.version);
+  loadData(props.version);
 });
 
 // Take a copy of runes
@@ -252,9 +252,9 @@ const secondaryNumSelected = computed(
     }, 0) || 0
 );
 
-function loadRunes(version: GameVersion) {
+function loadData(version: GameVersion) {
   if (!dataDragonStore.runes.has(version)) {
-    dataDragonStore.loadRunes(version);
+    dataDragonStore.loadData(version);
   }
 }
 

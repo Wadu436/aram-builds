@@ -14,7 +14,14 @@ import (
 
 var serverConfig server.ServerConfig = server.ServerConfig{
 	Auth: auth.Auth{
-		LoadUser:   db.LoadUser,
+		LoadUser: func(username string) (user auth.User, exists bool) {
+			exists = true
+			user, err := db.LoadUser(username)
+			if err != nil {
+				exists = false
+			}
+			return
+		},
 		StoreUser:  db.StoreUser,
 		Hash:       crypto.SHA256,
 		SaltLength: 32,

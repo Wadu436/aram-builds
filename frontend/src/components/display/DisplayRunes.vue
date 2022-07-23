@@ -3,10 +3,9 @@
     class="w-11/12 flex flex-col items-center"
     v-if="runeDataPrimary && runeDataSecondary"
   >
-    <div class="text-2xl">Runes</div>
-    <div class="flex bg-stone-800 w-fit p-4 rounded-md">
+    <div class="flex w-3/4">
       <!-- First Column -->
-      <div class="w-56 mx-2">
+      <div class="basis-1 flex-grow mx-2 bg-stone-800 p-4 rounded-md">
         <!-- Primary Tree -->
         <div>
           <!-- Title -->
@@ -55,7 +54,7 @@
       <!-- <div class="w-1 bg-stone-700 rounded-md"></div> -->
 
       <!-- Second Column -->
-      <div class="w-56 mx-2">
+      <div class="basis-1 flex-grow mx-2 bg-stone-800 p-4 rounded-md">
         <!-- Secondary Tree -->
         <div>
           <!-- Title -->
@@ -97,10 +96,10 @@
             <!-- Slots -->
             <div v-for="(slot, i) in row" :key="i">
               <div
+                class="border-2 rounded-full border-transparent"
                 :class="{
                   'grayscale opacity-40': props.build.runes.stats[j] !== i,
-                  'border-2 border-yellow-400 rounded-full':
-                    props.build.runes.stats[j] == i,
+                  'border-yellow-400 ': props.build.runes.stats[j] == i,
                 }"
               >
                 <img class="w-6 h-6" :src="slot.icon" alt="" />
@@ -136,7 +135,7 @@ const runeDataSecondary = computed(() =>
 // Check if runeData needs to be loaded
 watch(version, (version) => {
   if (!dataDragonStore.runes.has(version)) {
-    dataDragonStore.loadRunes(version);
+    dataDragonStore.loadData(version);
   }
 });
 </script>
