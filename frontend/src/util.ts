@@ -32,3 +32,19 @@ export function versionSortKey(a: GameVersion, b: GameVersion) {
   // a must be equal to b
   return 0;
 }
+
+export const tiers = [
+  { key: 1, text: "S" },
+  { key: 2, text: "A" },
+  { key: 3, text: "B" },
+  { key: 4, text: "C" },
+  { key: 5, text: "D" },
+];
+
+export const tiersMap = new Map([
+  [1, "S"],
+  [2, "A"],
+  [3, "B"],
+  [4, "C"],
+  [5, "D"],
+]);

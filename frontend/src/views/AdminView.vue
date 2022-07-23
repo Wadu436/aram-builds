@@ -85,23 +85,43 @@
               :version="editingBuild.version"
             ></EditRunes>
             <div class="flex gap-2 justify-center items-center mt-3">
-              <div>Version:</div>
-              <select
-                name=""
-                id=""
-                class="bg-stone-700 p-2 rounded-md"
-                v-model="editingBuild.version"
-              >
-                <option
-                  :value="version"
-                  v-for="version in [
-                    ...dataDragonStore.versions.keys(),
-                  ].reverse()"
-                  :key="version"
+              <div>
+                <div>Version:</div>
+                <select
+                  name=""
+                  id=""
+                  class="bg-stone-700 p-2 rounded-md"
+                  v-model="editingBuild.version"
                 >
-                  {{ version }}
-                </option>
-              </select>
+                  <option
+                    :value="version"
+                    v-for="version in [
+                      ...dataDragonStore.versions.keys(),
+                    ].reverse()"
+                    :key="version"
+                  >
+                    {{ version }}
+                  </option>
+                </select>
+              </div>
+              <div>
+                <div>Tier:</div>
+                <select
+                  name=""
+                  id=""
+                  class="bg-stone-700 p-2 rounded-md"
+                  v-model="editingBuild.tier"
+                >
+                  <option :value="null">No Tier</option>
+                  <option
+                    :value="tier.key"
+                    v-for="tier in tiers"
+                    :key="tier.key"
+                  >
+                    {{ tier.text }}
+                  </option>
+                </select>
+              </div>
             </div>
             <div class="flex gap-2 justify-center items-center mt-3">
               <div>Comment:</div>
@@ -149,7 +169,7 @@
 
 <script setup lang="ts">
 import { useDataDragonStore } from "@/stores/DataDragonStore";
-import { canonicalizeString } from "@/util";
+import { canonicalizeString, tiers } from "@/util";
 import { ref, computed, type Ref, watch } from "vue";
 import ChampionPortrait from "../components/portraits/ChampionPortrait.vue";
 

@@ -48,8 +48,14 @@
             ></EditSummonersButton>
           </div>
           <div class="flex items-center bg-stone-800 p-4 rounded-md gap-3">
-            <div class="text-3xl flex-grow flex justify-center items-center">
-              B
+            <div
+              class="text-3xl w-8 flex-grow flex justify-center items-center"
+            >
+              {{
+                (currentBuild?.tier
+                  ? tiersMap.get(currentBuild?.tier)
+                  : null) || "-"
+              }}
             </div>
             <div class="text-lg">Tier</div>
           </div>
@@ -90,7 +96,7 @@ import DisplayRunes from "../components/display/DisplayRunes.vue";
 import DisplayItems from "../components/display/DisplayItems.vue";
 import IconBack from "../components/icons/IconBack.vue";
 import { getBuild, getBuilds } from "@/api";
-import { versionSortKey } from "@/util";
+import { versionSortKey, tiersMap } from "@/util";
 import EditSummonersButton from "../components/edit/EditSummoners.vue";
 import EditSkills from "../components/edit/EditSkills.vue";
 
