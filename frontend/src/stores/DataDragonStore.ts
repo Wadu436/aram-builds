@@ -1,3 +1,4 @@
+
 import type {
   RuneTree,
   Item,
@@ -10,6 +11,7 @@ import { defineStore } from "pinia";
 
 type DDState = {
   // first index is version (e.g. 12.13), second is tree key (e.g. Domination)
+
   runes: Map<GameVersion, Map<string, RuneTree>>;
   items: Map<GameVersion, Map<string, Item>>;
   summoners: Map<GameVersion, Map<string, Summoner>>;
@@ -65,7 +67,6 @@ interface RuneTreeResponse {
     }
   ];
 }
-
 interface ItemResponse {
   name: string;
   image: RiotImage;
@@ -88,7 +89,6 @@ interface SummonerResponse {
   image: RiotImage;
   modes: string[];
 }
-
 // Load stat runes
 const statIconAdaptiveForce =
   "https://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsAdaptiveForceIcon.png";
@@ -207,7 +207,6 @@ export const useDataDragonStore = defineStore({
         this.loadSummoners(version),
       ]);
     },
-
     async loadRunes(version: GameVersion) {
       // Create the cache for this version if it doesn't exist yet
       const runeMap = new Map();
