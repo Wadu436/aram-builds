@@ -5,7 +5,7 @@
         ><IconBack
       /></RouterLink>
     </div>
-    <div class="lg:flex-auto lg:basis-1/5 overflow-y-auto thin-scrollbar">
+    <div class="lg:flex-auto lg:basis-1/6 overflow-y-auto thin-scrollbar">
       <div class="flex flex-col items-center justify-center p-4">
         <div class="flex relative">
           <div class="flex flex-col items-center justify-center">
@@ -45,12 +45,32 @@
         </div>
       </div>
     </div>
-    <div class="lg:flex-auto lg:basis-2/5 flex items-center justify-center">
-      <DisplayRunes v-if="currentBuild" :build="currentBuild" />
-    </div>
     <div
-      class="lg:flex-auto lg:basis-2/5 flex items-center justify-center text-3xl"
+      class="lg:flex-auto lg:basis-2/6 flex flex-col items-center justify-center"
     >
+      <div class="text-2xl">Runes</div>
+      <DisplayRunes v-if="currentBuild" :build="currentBuild" />
+      <div class="text-2xl mt-4">Summoners</div>
+      <div class="flex p-4 bg-stone-800 rounded-md gap-2">
+        <EditSummonersButton
+          v-if="currentBuild"
+          v-model="currentBuild.summoners[0]"
+          :edit="false"
+          :version="currentBuild.gameVersion"
+        ></EditSummonersButton>
+        <EditSummonersButton
+          v-if="currentBuild"
+          v-model="currentBuild.summoners[1]"
+          :edit="false"
+          :version="currentBuild.gameVersion"
+        ></EditSummonersButton>
+      </div>
+    </div>
+
+    <div
+      class="lg:flex-auto lg:basis-2/6 flex flex-col items-center justify-center text-3xl"
+    >
+      <div class="text-2xl">Items</div>
       <DisplayItems v-if="currentBuild" :build="currentBuild" />
     </div>
   </div>
@@ -65,6 +85,7 @@ import DisplayItems from "../components/display/DisplayItems.vue";
 import IconBack from "../components/icons/IconBack.vue";
 import { getBuild, getBuilds } from "@/api";
 import { versionSortKey } from "@/util";
+import EditSummonersButton from "../components/edit/EditSummonersButton.vue";
 
 const dataDragonStore = useDataDragonStore();
 

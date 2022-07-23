@@ -51,6 +51,9 @@ export interface BuildEdit {
   runes: BuildRunesEdit;
   items: BuildItems;
   comment: string;
+  summoners: string[];
+  skillOrder?: number[];
+  tier?: number;
 }
 
 export type GameVersion = string;

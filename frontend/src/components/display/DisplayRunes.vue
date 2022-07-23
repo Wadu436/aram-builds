@@ -3,7 +3,6 @@
     class="w-11/12 flex flex-col items-center"
     v-if="runeDataPrimary && runeDataSecondary"
   >
-    <div class="text-2xl">Runes</div>
     <div class="flex bg-stone-800 w-fit p-4 rounded-md">
       <!-- First Column -->
       <div class="w-56 mx-2">

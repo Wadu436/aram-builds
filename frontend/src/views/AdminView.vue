@@ -113,6 +113,21 @@
               >
               </textarea>
             </div>
+            <div class="flex gap-2 justify-center items-center mt-3">
+              <div>Summoner Spells:</div>
+              <div class="flex">
+                <EditSummonersButton
+                  v-model="editingBuild.summoners[0]"
+                  :version="editingBuild.version"
+                  :edit="true"
+                ></EditSummonersButton>
+                <EditSummonersButton
+                  v-model="editingBuild.summoners[1]"
+                  :version="editingBuild.version"
+                  :edit="true"
+                ></EditSummonersButton>
+              </div>
+            </div>
           </div>
           <EditItems
             v-model="editingBuild.items"
@@ -137,6 +152,7 @@ import EditRunes from "../components/edit/EditRunes.vue";
 import EditItems from "../components/edit/EditItems.vue";
 
 import { getBuild, getBuilds, postBuild } from "@/api";
+import EditSummonersButton from "../components/edit/EditSummonersButton.vue";
 
 const dataDragonStore = useDataDragonStore();
 
@@ -266,6 +282,9 @@ function validateBuild(build: BuildEdit): Build | null {
     runes: validatedRunes,
     items: build.items,
     comment: build.comment,
+    summoners: build.summoners,
+    skillOrder: build.skillOrder,
+    tier: build.tier,
   };
   return validatedBuild;
 }
@@ -296,6 +315,7 @@ function createNewBuild() {
       fullbuildComment: "",
     },
     comment: "",
+    summoners: ["SummonerSnowball", "SummonerFlash"],
   };
   editingBuild.value = newBuild;
 }

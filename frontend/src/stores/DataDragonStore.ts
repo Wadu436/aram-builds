@@ -306,7 +306,7 @@ export const useDataDragonStore = defineStore({
             summonerMap.set(key, {
               id: key,
               name: item.name,
-              image: `https://ddragon.leagueoflegends.com/cdn/${urlVersion}/img/item/${item.image.full}`,
+              image: `https://ddragon.leagueoflegends.com/cdn/${urlVersion}/img/spell/${item.image.full}`,
               sprite: {
                 sprite: `https://ddragon.leagueoflegends.com/cdn/${urlVersion}/img/sprite/${item.image.sprite}`,
                 x: item.image.x,
