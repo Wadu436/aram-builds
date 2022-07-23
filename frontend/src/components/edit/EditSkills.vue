@@ -3,12 +3,15 @@
     <div
       class="flex flex-col gap-1 bg-stone-800 rounded-md p-4"
       :class="{
-        'bg-red-500 bg-opacity-10': validatedLevels === null,
+        'bg-red-500 bg-opacity-10': validatedLevels === null && edit,
       }"
     >
       <div v-for="spell in [...Array(4).keys()]" :key="spell">
         <div class="flex gap-1 justify-center items-center">
-          <div class="w-8 h-8 flex justify-center items-center">
+          <div
+            class="w-7 h-7 flex justify-center items-center"
+            :class="{ 'mr-4': !edit }"
+          >
             <img
               class="rounded-md"
               v-if="championData"
@@ -16,21 +19,26 @@
               alt=""
             />
           </div>
-          <div class="w-10 flex justify-center items-center">
+          <div class="w-11 h-7 flex justify-center items-center" v-if="edit">
             {{ modelValue.filter((v) => v === spell).length }} /
             {{ championData?.spells[spell].maxrank || 5 }}
           </div>
           <div
             v-for="level in [...Array(18).keys()]"
             :key="level"
-            class="bg-stone-700 w-8 h-8 text-base flex justify-center items-center cursor-pointer rounded-md"
-            :class="{ 'bg-blue-500': modelValue[level] === spell }"
+            class="bg-stone-700 w-7 h-7 text-base flex justify-center items-center rounded-md"
+            :class="{
+              'bg-blue-500': modelValue[level] === spell,
+              'cursor-pointer': edit,
+            }"
             @click="
               () => {
-                changeSkillOrder(
-                  level,
-                  modelValue[level] === spell ? null : spell
-                );
+                if (edit) {
+                  changeSkillOrder(
+                    level,
+                    modelValue[level] === spell ? null : spell
+                  );
+                }
               }
             "
           >
@@ -46,7 +54,7 @@
 
 <script setup lang="ts">
 import { useDataDragonStore } from "@/stores/DataDragonStore";
-import type { GameVersion } from "@/types";
+import type { Build, GameVersion } from "@/types";
 import { computed } from "vue";
 
 const dataDragonStore = useDataDragonStore();

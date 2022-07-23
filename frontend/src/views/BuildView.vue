@@ -46,7 +46,7 @@
       </div>
     </div>
     <div
-      class="lg:flex-auto lg:basis-2/6 flex flex-col items-center justify-center"
+      class="lg:flex-auto lg:basis-1/4 flex flex-col items-center justify-center"
     >
       <div class="text-2xl">Runes</div>
       <DisplayRunes v-if="currentBuild" :build="currentBuild" />
@@ -60,10 +60,18 @@
     </div>
 
     <div
-      class="lg:flex-auto lg:basis-2/6 flex flex-col items-center justify-center text-3xl"
+      class="lg:flex-auto lg:basis-5/12 flex flex-col items-center justify-center"
     >
       <div class="text-2xl">Items</div>
       <DisplayItems v-if="currentBuild" :build="currentBuild" />
+      <div class="text-2xl mt-4">Skill Order</div>
+      <EditSkills
+        :edit="false"
+        v-if="currentBuild?.skillOrder"
+        v-model="currentBuild.skillOrder"
+        :champion="currentBuild.champion"
+        :version="currentBuild.gameVersion"
+      />
     </div>
   </div>
 </template>
@@ -78,6 +86,7 @@ import IconBack from "../components/icons/IconBack.vue";
 import { getBuild, getBuilds } from "@/api";
 import { versionSortKey } from "@/util";
 import EditSummonersButton from "../components/edit/EditSummoners.vue";
+import EditSkills from "../components/edit/EditSkills.vue";
 
 const dataDragonStore = useDataDragonStore();
 
