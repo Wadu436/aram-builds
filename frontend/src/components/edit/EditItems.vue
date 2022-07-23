@@ -229,14 +229,14 @@ const filteredItems = computed(() => {
 });
 
 // Check if runeData needs to be loaded
-loadItems(props.version);
+loadData(props.version);
 watch(props, (props) => {
-  loadItems(props.version);
+  loadData(props.version);
 });
 
-function loadItems(version: GameVersion) {
+function loadData(version: GameVersion) {
   if (!dataDragonStore.items.has(version)) {
-    dataDragonStore.loadItems(version);
+    dataDragonStore.loadData(version);
   }
 }
 

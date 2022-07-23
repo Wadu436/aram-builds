@@ -1,37 +1,52 @@
-import type { RuneTree, Item, Champion, GameVersion, RuneStats } from "@/types";
+import type {
+  RuneTree,
+  Item,
+  Champion,
+  GameVersion,
+  RuneStats,
+  Summoner,
+} from "@/types";
 import { defineStore } from "pinia";
 
 type DDState = {
   // first index is version (e.g. 12.13), second is tree key (e.g. Domination)
-  runes: Map<string, Map<string, RuneTree>>;
-  items: Map<string, Map<string, Item>>;
+  runes: Map<GameVersion, Map<string, RuneTree>>;
+  items: Map<GameVersion, Map<string, Item>>;
+  summoners: Map<GameVersion, Map<string, Summoner>>;
   champions: Map<string, Champion>;
   versions: Map<GameVersion, string>;
   statRunes: RuneStats;
   currentVersion: GameVersion;
 };
 
-interface DataDragonChampionResponse {
+interface RiotImage {
+  full: string;
+  sprite: string;
+  group: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+interface ChampionResponse {
   data: {
     [key: string]: {
       id: string;
       name: string;
       title: string;
       blurb: string;
-      image: {
-        full: string;
-        sprite: string;
-        group: string;
-        x: number;
-        y: number;
-        w: number;
-        h: number;
+      image: RiotImage;
+      spells: {
+        [key: number]: {
+          image: RiotImage;
+        };
       };
     };
   };
 }
 
-interface DataDragonRuneTreeResponse {
+interface RuneTreeResponse {
   id: number;
   key: string;
   icon: string;
@@ -52,17 +67,9 @@ interface DataDragonRuneTreeResponse {
   ];
 }
 
-interface DataDragonItemResponse {
+interface ItemResponse {
   name: string;
-  image: {
-    full: string;
-    sprite: string;
-    group: string;
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-  };
+  image: RiotImage;
   gold: {
     base: number;
     purchasable: boolean;
@@ -74,6 +81,12 @@ interface DataDragonItemResponse {
   maps?: {
     "12"?: boolean;
   };
+}
+
+interface SummonerResponse {
+  id: string;
+  name: string;
+  image: RiotImage;
 }
 
 // Load stat runes
@@ -128,6 +141,7 @@ export const useDataDragonStore = defineStore({
     ({
       runes: new Map(),
       items: new Map(),
+      summoners: new Map(),
       champions: new Map(),
       versions: new Map(),
       statRunes: {},
@@ -144,13 +158,25 @@ export const useDataDragonStore = defineStore({
 
       // Load champion info
       await fetch(
-        `https://ddragon.leagueoflegends.com/cdn/${urlVersion}/data/en_US/champion.json`
+        `https://ddragon.leagueoflegends.com/cdn/${urlVersion}/data/en_US/championFull.json`
       )
         .then((response) => response.json())
-        .then((data: DataDragonChampionResponse) =>
+        .then((data: ChampionResponse) =>
           Object.keys(data.data)
             .map((key) => data.data[key])
             .forEach((value) => {
+              const spells = [0, 1, 2, 3].map((val) => {
+                return {
+                  image: `https://ddragon.leagueoflegends.com/cdn/${urlVersion}/img/spell/${value.spells[val].image.full}`,
+                  sprite: {
+                    sprite: `https://ddragon.leagueoflegends.com/cdn/${urlVersion}/img/sprite/${value.spells[val].image.sprite}`,
+                    x: value.spells[val].image.x,
+                    y: value.spells[val].image.y,
+                    w: value.spells[val].image.w,
+                    h: value.spells[val].image.h,
+                  },
+                };
+              });
               this.champions.set(value.id, {
                 id: value.id,
                 name: value.name,
@@ -167,9 +193,18 @@ export const useDataDragonStore = defineStore({
                   w: value.image.w,
                   h: value.image.h,
                 },
+                spells: spells,
               });
             })
         );
+    },
+
+    async loadData(version: GameVersion) {
+      await Promise.all([
+        this.loadRunes(version),
+        this.loadItems(version),
+        this.loadSummoners(version),
+      ]);
     },
 
     async loadRunes(version: GameVersion) {
@@ -185,7 +220,7 @@ export const useDataDragonStore = defineStore({
         `https://ddragon.leagueoflegends.com/cdn/${urlVersion}/data/en_US/runesReforged.json`
       )
         .then((response) => response.json())
-        .then((data: DataDragonRuneTreeResponse[]) => {
+        .then((data: RuneTreeResponse[]) => {
           data.forEach((tree) => {
             runeMap.set(tree.key, {
               key: tree.key,
@@ -219,7 +254,7 @@ export const useDataDragonStore = defineStore({
         `https://ddragon.leagueoflegends.com/cdn/${urlVersion}/data/en_US/item.json`
       )
         .then((response) => response.json())
-        .then((data: { data: { [key: string]: DataDragonItemResponse } }) => {
+        .then((data: { data: { [key: string]: ItemResponse } }) => {
           Object.keys(data.data).forEach((key) => {
             const item = data.data[key];
 
@@ -249,6 +284,39 @@ export const useDataDragonStore = defineStore({
       this.items.set(version, itemMap);
     },
 
+    async loadSummoners(version: GameVersion) {
+      const summonerMap: Map<string, Summoner> = new Map();
+      const urlVersion = this.versions.get(version);
+      if (!urlVersion) {
+        return;
+      }
+
+      // Load rune info
+      await fetch(
+        `https://ddragon.leagueoflegends.com/cdn/${urlVersion}/data/en_US/summoner.json`
+      )
+        .then((response) => response.json())
+        .then((data: { data: { [key: string]: SummonerResponse } }) => {
+          Object.keys(data.data).forEach((key) => {
+            const item = data.data[key];
+
+            summonerMap.set(key, {
+              id: key,
+              name: item.name,
+              image: `https://ddragon.leagueoflegends.com/cdn/${urlVersion}/img/item/${item.image.full}`,
+              sprite: {
+                sprite: `https://ddragon.leagueoflegends.com/cdn/${urlVersion}/img/sprite/${item.image.sprite}`,
+                x: item.image.x,
+                y: item.image.y,
+                w: item.image.w,
+                h: item.image.h,
+              },
+            });
+          });
+        });
+      this.summoners.set(version, summonerMap);
+    },
+
     async initialize() {
       this.statRunes = {
         slots: [
@@ -263,11 +331,10 @@ export const useDataDragonStore = defineStore({
         .then((response) => response.json())
         .then((data: [string]) => {
           data.reverse().forEach((version) => {
-            const match = version.match(/^(\d+)\.(\d+)\.\d+$/);
+            const match = version.match(/^(\d+\.\d+)\.\d+$/);
             if (match) {
-              const v: GameVersion = `${Number(match[1])}.${Number(match[2])}`;
-              this.versions.set(v, match[0]);
-              this.currentVersion = v;
+              this.versions.set(match[1], match[0]);
+              this.currentVersion = match[1];
             }
           });
           // this.versions = data[0];
@@ -276,8 +343,7 @@ export const useDataDragonStore = defineStore({
       // Preload champion info for latest version
       await Promise.all([
         this.loadChampions(),
-        this.loadRunes(this.currentVersion),
-        this.loadItems(this.currentVersion),
+        this.loadData(this.currentVersion),
       ]);
     },
   },

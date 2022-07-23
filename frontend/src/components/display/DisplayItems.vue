@@ -56,7 +56,7 @@ const itemsStore = computed(() => {
 // Check if itemData needs to be loaded
 watch(version, (version) => {
   if (!dataDragonStore.items.has(version)) {
-    dataDragonStore.loadItems(version);
+    dataDragonStore.loadData(version);
   }
 });
 </script>

@@ -213,9 +213,9 @@ const emit = defineEmits(["update:modelValue"]);
 const lastSelectedSecondarySlot: Ref<number | null> = ref(null);
 
 // Check if runeData needs to be loaded
-loadRunes(props.version);
+loadData(props.version);
 watch(props, (props) => {
-  loadRunes(props.version);
+  loadData(props.version);
 });
 
 // Take a copy of runes
@@ -252,9 +252,9 @@ const secondaryNumSelected = computed(
     }, 0) || 0
 );
 
-function loadRunes(version: GameVersion) {
+function loadData(version: GameVersion) {
   if (!dataDragonStore.runes.has(version)) {
-    dataDragonStore.loadRunes(version);
+    dataDragonStore.loadData(version);
   }
 }
 
