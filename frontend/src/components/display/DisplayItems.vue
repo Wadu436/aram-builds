@@ -10,7 +10,9 @@
           </div>
         </div>
         <!-- Comment -->
-        <div class="bg-stone-700 p-4 rounded-md mt-4 text-base">
+        <div
+          class="bg-stone-700 p-4 rounded-md mt-4 text-base whitespace-pre-wrap"
+        >
           {{ build.items.startComment }}
         </div>
       </div>
@@ -27,7 +29,9 @@
           </div>
         </div>
         <!-- Comment -->
-        <div class="bg-stone-700 p-4 rounded-md mt-4 text-base">
+        <div
+          class="bg-stone-700 p-4 rounded-md mt-4 text-base whitespace-pre-wrap"
+        >
           {{ build.items.fullbuildComment }}
         </div>
       </div>

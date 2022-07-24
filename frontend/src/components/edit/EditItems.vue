@@ -82,7 +82,7 @@
                 }
               "
             >
-              <div v-if="modelValue.startComment">
+              <div class="whitespace-pre-wrap" v-if="modelValue.startComment">
                 {{ modelValue.startComment }}
               </div>
               <div class="text-stone-400" v-else>No Comment</div>
@@ -146,7 +146,10 @@
                 }
               "
             >
-              <div v-if="modelValue.fullbuildComment">
+              <div
+                class="whitespace-pre-wrap"
+                v-if="modelValue.fullbuildComment"
+              >
                 {{ modelValue.fullbuildComment }}
               </div>
               <div class="text-stone-400" v-else>No Comment</div>
