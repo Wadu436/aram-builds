@@ -1,5 +1,6 @@
 import { useStateStore } from "./stores/state";
 import type { BuildMeta, GameVersion, Build } from "./types";
+import { versionSortKey } from "./util";
 
 export async function getAllBuilds(): Promise<BuildMeta[]> {
   const response = await fetch(`/api/build/`);
@@ -16,7 +17,14 @@ export async function getBuilds(championId: string): Promise<BuildMeta[]> {
     throw response.status;
   }
 
-  return await response.json();
+  const data: BuildMeta[] = await response.json();
+  data
+    .sort((a: BuildMeta, b: BuildMeta) => {
+      return versionSortKey(a.gameVersion, b.gameVersion);
+    })
+    .reverse();
+
+  return data;
 }
 
 export async function getBuild(
@@ -58,4 +66,21 @@ export async function verifyHeaders(headers: Headers): Promise<boolean> {
     }
   }
   return true;
+}
+
+export async function deleteBuild(
+  championId: string,
+  version: GameVersion
+): Promise<void> {
+  const stateStore = useStateStore();
+
+  const response = await fetch(`/api/build/${championId}/${version}`, {
+    method: "DELETE",
+    headers: stateStore.authHeaders,
+  });
+  if (!response.ok) {
+    throw response.status;
+  }
+
+  return;
 }

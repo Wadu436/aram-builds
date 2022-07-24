@@ -45,6 +45,12 @@
         </div>
         <div class="flex items-center gap-4">
           <button
+            class="p-2 bg-red-700 rounded-md hover:bg-stone-600"
+            @click="deleteCurrentBuild"
+          >
+            Delete Build
+          </button>
+          <button
             class="p-2 bg-stone-700 rounded-md hover:bg-stone-600"
             @click="createNewBuild"
           >
@@ -178,7 +184,7 @@ import type { Build, BuildEdit, BuildMeta, BuildRunes } from "@/types";
 import EditRunes from "../components/edit/EditRunes.vue";
 import EditItems from "../components/edit/EditItems.vue";
 
-import { getBuild, getBuilds, postBuild } from "@/api";
+import { getBuild, getBuilds, postBuild, deleteBuild } from "@/api";
 import EditSummonersButton from "../components/edit/EditSummoners.vue";
 import EditSkills from "../components/edit/EditSkills.vue";
 
@@ -210,9 +216,13 @@ const validatedBuild = computed(() => {
   }
 });
 
-watch(selectedChampionId, (championId) => {
-  loadBuilds(championId);
-  editingBuild.value = undefined;
+watch(selectedChampionId, async (championId) => {
+  await loadBuilds(championId);
+  if (selectedChampionBuilds.value.length > 0) {
+    selectBuild(selectedChampionBuilds.value[0]);
+  } else {
+    editingBuild.value = undefined;
+  }
 });
 
 async function loadBuilds(championId: string) {
@@ -338,6 +348,14 @@ async function saveBuild() {
   if (build) {
     await postBuild(build);
     await loadBuilds(selectedChampionId.value);
+  }
+}
+
+async function deleteCurrentBuild() {
+  if (editingBuild.value) {
+    await deleteBuild(editingBuild.value.champion, editingBuild.value.version);
+    await loadBuilds(selectedChampionId.value);
+    selectBuild(selectedChampionBuilds.value[0]);
   }
 }
 
