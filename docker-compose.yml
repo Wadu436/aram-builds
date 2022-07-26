@@ -10,6 +10,7 @@ services:
       POSTGRES_DB: builds
     volumes:
       - db-data:/var/lib/postgresql/data
+    restart: unless-stopped
 
   backend:
     image: wadu436/aram-builds:backend
@@ -33,6 +34,7 @@ services:
       - "traefik.http.routers.builds_backend.tls=true"
       - "traefik.http.routers.builds_backend.tls.certresolver=letsencrypt"
       - "traefik.docker.network=traefik_proxy"
+    restart: unless-stopped
 
   frontend:
     image: wadu436/aram-builds:frontend
@@ -50,6 +52,7 @@ services:
       - "traefik.http.routers.builds_frontend.tls=true"
       - "traefik.http.routers.builds_frontend.tls.certresolver=letsencrypt"
       - "traefik.docker.network=traefik_proxy"
+    restart: unless-stopped
 
 volumes:
   db-data:
