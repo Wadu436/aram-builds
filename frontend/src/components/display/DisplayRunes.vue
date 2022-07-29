@@ -133,6 +133,9 @@ const runeDataSecondary = computed(() =>
 );
 
 // Check if runeData needs to be loaded
+if (!dataDragonStore.runes.has(version.value)) {
+  dataDragonStore.loadData(version.value);
+}
 watch(version, (version) => {
   if (!dataDragonStore.runes.has(version)) {
     dataDragonStore.loadData(version);
